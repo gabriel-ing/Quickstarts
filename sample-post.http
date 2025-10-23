@@ -1,0 +1,9 @@
+
+POST http://localhost:52773/petapi/pet
+Content-Type: application/json
+
+{
+    "PetId": 3,
+    "Name": "Fido",
+    "Type": ""
+}
