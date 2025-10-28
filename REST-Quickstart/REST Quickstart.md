@@ -146,7 +146,8 @@ We now need to define these class methods in the implementation class:
 	{...}
 	ClassMethod GetPet(pid As %Integer) As %DynamicObject
 	{....}
-
+	}
+	
 Here `%DynamicObject` is the output of the class, `%DynamicObject` is [essentially JSON format in ObjectScript]([Using JSON in ObjectScript | Using JSON | InterSystems IRIS Data Platform 2025.2](https://docs.intersystems.com/iris20252/csp/docbook/Doc.View.cls?KEY=GJSON_intro))
 
 The `AddPet()` implementation method needs to:
