@@ -3,7 +3,7 @@ A major benefit of the InterSystems core technology IRIS is its ability to run s
 
 IRIS runs on Object-oriented code within Classes. The functions within the classes are called methods and are written in Embedded languages - ObjectScript and Python. 
 
-This guide is meant to be a one-stop reference guide to IRIS classes and coding with ObjectScript and embedded Python for experienced coders. For comprehensive documentation, see the relevant sectons of documentation: 
+This guide is meant to be a one-stop reference guide to IRIS classes and coding with ObjectScript and embedded Python for experienced developers. For comprehensive documentation, see the relevant sectons of documentation: 
 - [Basic Ideas in Class Programming](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=GOBJ_intro)
 - [Introduction to ObjectScript](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=GCOS_intro)
 - [Introduction to Embedded Python](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=AFL_epython)
@@ -129,7 +129,7 @@ To use properties:
 
 ```
 set object.VariableName = "Hello World"
-write object.PropertyName // prints Hello World to terminal
+write object.VariableName // prints Hello World to terminal
 ```
 
 A method can be used from an object:
@@ -187,6 +187,9 @@ position: 4
 ```
 
 Subscripts and values can be any type. If you create a SQL table in IRIS, it will be stored as a global, with each row being stored under a different index ID.
+
+For a detailed explaination of globals, see: [Video: What Are Globals? | Youtube](https://www.youtube.com/watch?v=jJifoZq2bW0)
+
 
 ### Embedded Python 
 
