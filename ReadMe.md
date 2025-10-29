@@ -6,17 +6,20 @@ Currently have first drafts of:
 - [External Python](ExternalPython/External%20Python%20Quickstart.md)
 - [REST](REST-Quickstart/REST%20Quickstart.md)
 - [Setting Up Development environment (VS Code)](DevelopmentEnvironment/Development%20Environment%20Set-up.md)
+- [Vector Search](VectorSearch/VectorSearch.md)
 
 Below is the suggested list of quickstarts still to be written: 
 
 - Running IRIS (community?) on docker / on the cloud. This is basically [Derek's article](https://community.intersystems.com/post/how-get-intersystems-iris-community-edition)
 - IRIS SQL basics (how it differs from other SQL dialects + How to use SQL from ObjectScript)
 - Interoperability productions
-- Vector Search
 - Integrated ML 
-- Analytics
 - FHIR server
 
+To go to contractor: 
+- Java
+- .NET
+- Analytics
 
 
 As an aside, this is a nice feature of the vector search documentation page: 

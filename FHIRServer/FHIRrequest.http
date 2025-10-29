@@ -1,0 +1,3 @@
+GET http://localhost:52773/demo/fhir/Patient
+Authorization: Basic SuperUser SYS
+Accept: application/fhir+json
