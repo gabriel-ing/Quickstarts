@@ -7,14 +7,19 @@ Currently have first drafts of:
 - [REST](REST-Quickstart/REST%20Quickstart.md)
 - [Setting Up Development environment (VS Code)](DevelopmentEnvironment/Development%20Environment%20Set-up.md)
 - [Vector Search](VectorSearch/VectorSearch.md)
+- [Creating a FHIR Server ](FHIRServer/CreateAFHIRSeverIn5Minutes.md) 
+    - This might benefit from another related page on using the FHIR server
+
+I have WIP pieces on
+- [Using SQL](SQL/SQLFromObjectscript.md)
+- [IRIS-SQL Essentials](SQL/IRIS-SQL-Basics.md)
 
 Below is the suggested list of quickstarts still to be written: 
 
 - Running IRIS (community?) on docker / on the cloud. This is basically [Derek's article](https://community.intersystems.com/post/how-get-intersystems-iris-community-edition)
-- IRIS SQL basics (how it differs from other SQL dialects + How to use SQL from ObjectScript)
 - Interoperability productions
 - Integrated ML 
-- FHIR server
+
 
 To go to contractor: 
 - Java

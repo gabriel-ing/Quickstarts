@@ -25,17 +25,28 @@ write output
 // Run a class method
 do ##class(packagename.ClassName).MethodName()
 
+
+// Lists
+set mylist = $LISTBUILD("Apple", "Orange", "Pear")
+
+// Accessing list items
+write $LIST(mylist, 2) //prints "Orange" (index starts at 1)
+
 // Arrays 
 set myarray(1) = "Hello"
 set myarray(2) = "World"
+set myarray("Foo") = "bar"
 
-// Writing arrays
+// Accessing array items
+write myarray(1), myarray(2) //prints "HelloWorld" 
+
+// Writing Arrays
 zwrite myarray 
-
 /*Output: 
 	myarray(1)="Hello"
 	myarray(2)="World"
-*/ 
+	myarray("Foo")="bar" 
+*/
 
 // basic conditional
 if (n = 1){
