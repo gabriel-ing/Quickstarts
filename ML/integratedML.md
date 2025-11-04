@@ -21,20 +21,23 @@ docker exec -it iris-community bash
 and run the following command: 
 
 ```bash
-python3 -m pip install --index-url https://registry.intersystems.com/pypi/simple --no-cache-dir --target <IRIS-INSTALL>/mgr/python intersystems-iris-automl
-```
-
-If you are running IRIS community edition in a docker container as above, the IRIS-install will likely at `/usr/irissys/`, so the command is as follows: 
-
-```bash
 python3 -m pip install --index-url https://registry.intersystems.com/pypi/simple --no-cache-dir --target /usr/irissys/mgr/python intersystems-iris-automl
 ```
 
-## Install the dataset
+The install `--target` is the IRIS install location, and will vary by install method. The above is true for an IRIS Community image in a docker container, but may need to be altered for other install methods. 
 
-For this quickstart I will be using the [Titanic survival dataset](https://www.kaggle.com/datasets/heptapod/titanic). If you have experience with machine learning you will likely be familiar with this, if not, it is a dataset containing information on the passengers on the titanic, including class of cabin, gender, age and price of ticket. 
+If you run into permissions errors, restart the bash shell as root:
+```
+docker exec -it --user root iris-community bash
+```
+
+# Predicting Survival on the Titanic
+
+This quickstart uses the [Titanic survival dataset](https://www.kaggle.com/datasets/heptapod/titanic). If you have experience with machine learning you will likely be familiar with this, if not, it is a dataset containing information on the passengers on the titanic, including class of cabin, gender, age and price of ticket. This information can be used to make an informed prediction on whether each individual passenger died or survived the disaster.
 
 If you would rather use your own dataset, feel free to skip the install below and load your data with one of the many methods available.
+
+## Install the dataset
 
 This dataset has been packaged with the InterSystems Package Manager (IPM), so it can be downloaded from the IRIS command line. You can open an IRIS terminal from VS Code, or from the regular terminal with: 
 
@@ -67,29 +70,30 @@ And download the dataset with:
 install dataset-titanic
 ```
 
-## Splitting the data
-**From this point the rest of the tutorial is performed in SQL, this can be run from the Management Portal SQL Editor at: http://localhost:52773/csp/sys/exp/%25CSP.UI.Portal.SQL.Home.zen?$NAMESPACE=USER. 
+## Test/Train Split
+**From this point the rest of the tutorial is performed in SQL, this can be run from the Management Portal SQL Editor at: http://localhost:52773/csp/sys/exp/%25CSP.UI.Portal.SQL.Home.zen?$NAMESPACE=USER** 
 
-However, the SQL can also be performed from any other SQL client, including SQLTools, DBeaver, Python DB-API, ObjectScript etc.
+**However, the SQL can also be performed from any other SQL client, including SQLTools, DBeaver, Python DB-API, ObjectScript etc.**
 
 
 When creating a machine learning model, it is important to validate the predictions against data where you already know the result. Crutially, this test data cannot be present in the original training dataset, because otherwise it would not be a reliable test. Therefore the first step when creating a machine learning model, is splitting the data you are using into **training data** and **testing data**. 
 
 The proportion of the data split is a parameter that can be optimised, as more training data will create a better informed model, but more testing data will create more robust validation. In general, a good place to start is using approximately 70-80% percent of your data to train the model and 20-30% to test it. 
 
-In our titanic dataset, there are 892 passenger records, so I will take the top 700 records as the testing dataset (78%) and rest as the testing set. Here I am creating `VIEWS`, which are virtual tables that can be treated like a standard table, but do not duplicate the data.
+In our titanic dataset, there are 892 passenger records, so we will take the top 700 records as the testing dataset (78%) and rest as the testing set. Here we create `VIEWS`, which are virtual tables that can be treated like a standard table, but do not duplicate the data.
 
 ```sql
 CREATE VIEW dc_data.TitanicTrain AS
-SELECT TOP 700 * 
+SELECT * 
 FROM dc_data.Titanic
+WHERE id < 700
 ```
 
 ```sql
 CREATE VIEW dc_data.TitanicTest AS
 SELECT *
 FROM dc_data.Titanic
-OFFSET 700 ROWS
+WHERE id > 700
 ```
 
 ### Create the model
@@ -134,31 +138,37 @@ Theres a number of metrics that can measure performance in different ways, for e
 
 ![Validation Results](ValidationResults.png)
 
-If you are interested in what all these metrics are, they are explained in the [documentation](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=RSQL_validatemodel#RSQL_validatemodel_Metrics). For now, I will only focus on the accuracy which is simply the proportion of correct predictions, which, for here is 81%.
+If you are interested in what all these metrics are, they are explained in the [documentation](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=RSQL_validatemodel#RSQL_validatemodel_Metrics). The simplest validation metric is accuracy - this is simply the proportion of correctly classified results.
 
-81% is a good performance, especially for how easily the model was created.
+This model has an accuracy of 81%, which is pretty good, especially for how simply the model was created. There is random variability here, so model statistics may differ between runs (unless a seed value is set).
 
 ## Using the model
 The model can be used to predict values in a table with the same schema. It can also output a probability, which can give a confidence level for the prediction. These can be done with the `PREDICT(<modelname>)` and `PROBABILITY(<modelname>)` functions. 
 
 ## Predict
+To predict the output of the target column, run:
 ```sql
-SELECT *, PREDICT(TitanicSurvival) FROM dc_data.TitanicTest
+SELECT *,Survived, PREDICT(TitanicSurvival) As SurvivalPrediction FROM dc_data.TitanicTest
 ```
-Filter to see only the passengers who were predicted to Survive. 
+This will create a new column called SurvivalPrediction, containing the prediction. Survived has been added to the table twice to make comparison easier.
+
+![Table showing prediction in SurvivalPrediction Column](PredictionResults.png)
+
+It's also possible to use the results of the prediction to filter the output.
 ```sql
 SELECT * FROM dc_data.TitanicTest WHERE PREDICT(TitanicSurvival)=1
 ```
 
 ## Probability 
 
+The model can also output a probability value for the prediction using the `PROBABILITY(<modelname>)` function
 ```
-SELECT *, PROBABILITY(TitanicSurvival) FROM dc_data.TitanicTest
+SELECT *,Survived, PREDICT(TitanicSurvival) AS Prediction, PROBABILITY(TitanicSurvival) As Probability FROM dc_data.TitanicTest
 ```
 
-![alt text](PredictionResults.png)
+![Results table showing Prediction and Probability of the prediction](ProbabilityResults.png)
 
-
+This output shows that some the incorrect results had low confidence in the original prediction - for example Passenger 708, Edward Calderhead, was predicted to have a 43% likelihood of survival, and did survive. 
 # Regression
 
 The above example was a binary classification, classifying each datapoint into one of two categories - survived or didn't survive. It is also possible to perform regression, which is predicting a continuous value. Performing a regression is just as easy, you just need to chose a continuous numeric column as the column being predicted. 
@@ -175,21 +185,21 @@ TRAIN MODEL FarePrediction
 SELECT TOP 10 PassengerId, Fare, PREDICT(FarePrediction) AS PredictedFare FROM dc_data.TitanicTest
 ```
 
-| PassengerId | Fare    | PredictedFare |
-|-------------|---------|----------------|
-| 1           | 7.2500  | 13.00          |
-| 2           | 71.2833 | 72.45          |
-| 3           | 7.9250  | 7.93           |
-| 4           | 53.1000 | 58.61          |
-| 5           | 8.0500  | 8.24           |
-| 6           | 8.4583  | 7.04           |
-| 7           | 51.8625 | 46.41          |
-| 8           | 21.0750 | 22.21          |
-| 9           | 11.1333 | 12.41          |
-| 10          | 30.0708 | 27.79          |
+| PassengerId | Fare     | PredictedFare |
+|-------------|----------|--------------|
+| 701         | 227.5250 | 95.19         |
+| 702         | 26.2875  | 64.96          |
+| 703         | 14.4542  | 11.32          |
+| 704         | 7.7417   | 6.75           |
+| 705         | 7.8542   | 14.81          |
+| 706         | 26.0000  | 48.99          |
+| 707         | 13.5000  | 13.54          |
+| 708         | 26.2875  | 34.43          |
+| 709         | 151.5500 | 111.26         |
+| 710         | 15.2458  | 17.18          |
 
 
-Note, it is still worth running the model validation. In this example, the validation gave a Root Mean Squared Error of 27.16, and a R^2 value of 0.70. This that 70% of the variance in the data is accounted for by the model, which is pretty good. 
+It is still worth running the model validation in the same way as shown for the classification example. Here, the validation gave a Root Mean Squared Error of 43.90, and a R^2 value of 0.35. This that 70% of the variance in the data is accounted for by the model, which is pretty good. 
 
 The RMSE is high, this is the average difference betwen the predicted values and the actual values. This is a much bigger difference than can be seen in the output above, which may mean we have some major outliers. We can look at outliers by ordering the data by the magnitude of difference between the fare and predicted fare:
 
@@ -200,19 +210,34 @@ ORDER BY ABS(Fare - PREDICT(FarePrediction)) Desc
 ```
 
 | PassengerId | Fare     | PredictedFare |
-|-------------|----------|----------------|
-| 738         | 512.3292 | 27.41          |
-| 680         | 512.3292 | 37.12          |
-| 731         | 211.3375 | 68.40          |
-| 701         | 227.5250 | 87.91          |
-| 780         | 211.3375 | 78.09          |
-| 717         | 227.5250 | 98.65          |
-| 690         | 211.3375 | 95.15          |
-| 888         | 30.0000  | 137.23         |
-| 610         | 153.4625 | 50.53          |
-| 857         | 164.8667 | 80.87          |
+|-------------|----------|--------------|
+| 738         | 512.3292  | 25.52      |
+| 731         | 211.3375  | 64.16      |
+| 780         | 211.3375  | 76.87      |
+| 701         | 227.5250  | 95.19      |
+| 888         | 30.0000   | 130.55     |
+| 843         | 31.0000   | 123.85     |
+| 717         | 227.5250  | 143.06     |
+| 857         | 164.8667  | 84.26      |
+| 743         | 262.3750  | 190.93     |
+| 854         | 39.4000   | 103.76     |
 
-So As predicted, there are some very big outliers which skew the RMSE validation statistic. 
+
+So As predicted, there are some very big outliers which skew the RMSE validation statistic. But despite this, we can still see the value if we run the command again but this time in ascending order (remove `Desc` at the end):
+
+| PassengerId | Fare     | PredictedFare |
+|-------------|----------|--------------|
+| 707         | 13.5000  | 13.54      |
+| 817         | 7.9250   | 8.00       |
+| 876         | 7.2250   | 7.32       |
+| 762         | 7.1250   | 7.01       |
+| 889         | 23.4500  | 23.31      |
+| 806         | 7.7750   | 7.62       |
+| 808         | 7.7750   | 7.61       |
+| 776         | 7.7500   | 7.58       |
+| 765         | 7.7750   | 7.58       |
+| 786         | 7.2500   | 7.03       |
+
 
 
 ### Other Features
