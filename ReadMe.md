@@ -10,15 +10,16 @@ Currently have first drafts of:
 - [Creating a FHIR Server ](FHIRServer/CreateAFHIRSeverIn5Minutes.md) 
     - This might benefit from another related page on using the FHIR server
 - [Integrated ML](ML/integratedML.md) 
+- [Calling SQL Statements](SQL/CallingSQLStatements.md)
 
-I have WIP pieces on
-- [Using SQL](SQL/SQLFromObjectscript.md)
-- [IRIS-SQL Essentials](SQL/IRIS-SQL-Basics.md)
+I have WIP piece on
+- [InterSystems-SQL language features](SQL/InterSystems-SQL-Langauge-Features.md)
 
 Below is the suggested list of quickstarts still to be written: 
 
 - Running IRIS (community?) on docker / on the cloud. This is basically [Derek's article](https://community.intersystems.com/post/how-get-intersystems-iris-community-edition)
 - Interoperability productions
+- node.js
 
 To go to contractor: 
 - Java
