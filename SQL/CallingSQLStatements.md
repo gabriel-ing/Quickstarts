@@ -133,7 +133,7 @@ If you have a file containing SQL commands, you can run it from ObjectScript wit
   DO $SYSTEM.SQL.Schema.ImportDDL("c:\InterSystems\mysqlcode.txt",,"IRIS")
 ```
 
-### SQL in Embedded Python 
+## SQL in Embedded Python 
 
 You can use SQL in Embedded Python using `iris.sql`.
 
@@ -169,7 +169,7 @@ for row in rs:
 
 You can connect to IRIS databases using SQL from a number of external applications. 
 
-There are standard drivers for Java Database Connectivity (JDBC) and Open Database Connectivity (ODBC). These drivers can be used for connections from a range of langauges, which are covered separately on the [External Langauges page](Link needed!), and many applications that support these connection types, including the database explorer DBeaver, analytics tools like PowerBI and Tableau, ETL or integration platforms such as Talend and Informatica.
+There are standard drivers for Java Database Connectivity (JDBC) and Open Database Connectivity (ODBC). These drivers can be used for connections from a range of languages, which are covered separately on the [External Languages page](Link needed!), and many applications that support these connection types, including the database explorer DBeaver, analytics tools like PowerBI and Tableau, ETL or integration platforms such as Talend and Informatica.
 
 
 
@@ -181,7 +181,7 @@ JDBC is a database connection standard that is used within Java applications. To
 ```
 jdbc:IRIS://<host>:<port>/<namespace>
 ```
-- _Host_ is ther Server location, if running locally this is `localhost` or `127.0.0.1`
+- _Host_ is the Server location, if running locally this is `localhost` or `127.0.0.1`
 - _port_ is the TCP port number for binary connections, the default is `1972`
 - _Namespace_ is the namespace containing the data tables.
 

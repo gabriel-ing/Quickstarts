@@ -197,4 +197,4 @@ Output:
 ```
 (('A cup of coffee in the morning helps me focus better at work.',),)
 ```
-As one might expect, a 
+As one might expect, the sentence most similar to a query about Green tea is one about coffee. So there we have it, a simple vector search set-up, performed with InterSystems IRIS.
