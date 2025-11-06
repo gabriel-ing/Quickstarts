@@ -8,7 +8,7 @@ This guide is meant to be a one-stop reference guide to IRIS classes and coding 
 - [Introduction to ObjectScript](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=GCOS_intro)
 - [Introduction to Embedded Python](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=AFL_epython)
 
-## ObjectScript 101
+## ObjectScript Vasucs
 
 - ObjectScript is a weakly typed language, meaning the type of variable is not defined in the code. 
 - Standard operators are not case sensitive, variable names are all case sensitive.
@@ -51,9 +51,16 @@ zwrite myarray
 // basic conditional
 if (n = 1){
 	write "One"
-} elseif (n =2){
+} elseif (n = 2){
 	write "Two"
 }
+
+// Inline conditional
+// <command>:<condition> 
+
+write:n=1 "One" // Prints "One"
+write:n=2 "Two" // Does not write anything as conditional not fulfilled
+
 
 //Basic For loop
 // iterator = 

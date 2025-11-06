@@ -84,13 +84,22 @@ To manually Import and Compile the file, right click on the file in the Workspac
 
 - **Autocomplete**
 	The InterSystems VS code ObjectScript pack includes many helpful autocomplete features, like creating a class definition for a new `<class>.cls` file created in a package directory, and providing boilerplate component definitions. 
-
 - **Error Detection***
 	Any syntax errors in your code will be detected and detailed in the `Problems` pane at the bottom of the page.
 	![[vs-code-error-detection.png]]
 - **Compilation output**
 	You can see the output of any compilation attempts in the `Output` pane. 
 	![[vs-code-compilation-output.png]]
+- **ObjectScript REST Debugger** - There is a built-in debugger for REST APIs making the challenge of seeing the process behind requests much simpler. 
+
+
+### Recommended Third Party Extensions
+
+- Source control and **Git** - VS Codes built in support of git makes managing source control easy.
+- **Container tools** and **Docker** extensions 
+- **SQLTools for IRIS** - Lightweight SQL connection for quick queries. Community supported but not officially supported. 
+-  **Jupyter** and **Jupyter Server Proxy for InterSystems IRIS** for jupyter notebook support in VS code.
+- **REST Client** - allows sending of HTTP Requests from VS Code 
 
 
 

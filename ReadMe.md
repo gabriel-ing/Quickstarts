@@ -11,9 +11,8 @@ Currently have first drafts of:
     - This might benefit from another related page on using the FHIR server
 - [Integrated ML](ML/integratedML.md) 
 - [Calling SQL Statements](SQL/CallingSQLStatements.md)
-
-I have WIP piece on
 - [InterSystems-SQL language features](SQL/InterSystems-SQL-Langauge-Features.md)
+
 
 Below is the suggested list of quickstarts still to be written: 
 

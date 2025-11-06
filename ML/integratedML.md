@@ -7,7 +7,7 @@ This quickstart will go through how you can start using IRIS's Integrated Machin
 ## Download IRIS 
 
 If you haven't already, you can download IRIS-Community (or IRIS-Health-Community) from docker, or use an existing install. 
-```
+```bash
 docker run --name iris-community --publish 52773:52773 --publish 1972:1972 -d intersystems/iris-community:latest-em
 ```
 
@@ -26,10 +26,6 @@ python3 -m pip install --index-url https://registry.intersystems.com/pypi/simple
 
 The install `--target` is the IRIS install location, and will vary by install method. The above is true for an IRIS Community image in a docker container, but may need to be altered for other install methods. 
 
-If you run into permissions errors, restart the bash shell as root:
-```
-docker exec -it --user root iris-community bash
-```
 
 # Predicting Survival on the Titanic
 

@@ -171,10 +171,6 @@ You can connect to IRIS databases using SQL from a number of external applicatio
 
 There are standard drivers for Java Database Connectivity (JDBC) and Open Database Connectivity (ODBC). These drivers can be used for connections from a range of languages, which are covered separately on the [External Languages page](Link needed!), and many applications that support these connection types, including the database explorer DBeaver, analytics tools like PowerBI and Tableau, ETL or integration platforms such as Talend and Informatica.
 
-
-
-
-
 ### JDBC 
 JDBC is a database connection standard that is used within Java applications. To connect to IRIS using JDBC, use the following syntax to create a URL. 
 
@@ -191,7 +187,7 @@ jdbc:IRIS://localhost:1972/USER
 ```
 #### DBeaver
 
-Connections to IRIS is natively supported within the database client application [DBeaver](https://openexchange.intersystems.com/package/DBeaver). The connection can be done with the JDBC connection string above. For more information, see [DBeaver officially supports InterSystems IRIS](https://community.intersystems.com/post/dbeaver-officially-supports-intersystems-iris).
+Connections to IRIS are natively supported within the database client application [DBeaver](https://openexchange.intersystems.com/package/DBeaver). The connection can be done with the JDBC connection string above. For more information, see [DBeaver officially supports InterSystems IRIS](https://community.intersystems.com/post/dbeaver-officially-supports-intersystems-iris).
 
 ### ODBC
 
