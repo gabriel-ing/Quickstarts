@@ -12,13 +12,14 @@ Currently have first drafts of:
 - [Integrated ML](ML/integratedML.md) 
 - [Calling SQL Statements](SQL/CallingSQLStatements.md)
 - [InterSystems-SQL language features](SQL/InterSystems-SQL-Langauge-Features.md)
+- [Running IRIS community on docker / on the cloud](GettingStartedWithIRISCommunity/GettingStartedWithIRISCommunity.md). This is basically [Derek's article](https://community.intersystems.com/post/how-get-intersystems-iris-community-edition)
 
 
 Below is the suggested list of quickstarts still to be written: 
 
-- Running IRIS (community?) on docker / on the cloud. This is basically [Derek's article](https://community.intersystems.com/post/how-get-intersystems-iris-community-edition)
 - Interoperability productions
 - node.js
+- Web development / csp? 
 
 To go to contractor: 
 - Java
