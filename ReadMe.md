@@ -20,15 +20,15 @@ WIP:
 
 Below is the suggested list of quickstarts still to be written: 
 
+By me: 
+    - node.js
+    - Web development / csp? 
 
-- node.js
-- Web development / csp? 
 
-
-Others
-- Java
-- .NET
-- Analytics
+By Others:
+    - Java
+    - .NET
+    - Analytics
 
 
 As an aside, this is a nice feature of the vector search documentation page: 
