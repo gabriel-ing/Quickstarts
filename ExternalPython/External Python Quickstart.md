@@ -1,6 +1,6 @@
 ## Connecting to IRIS from External Python programs 
 
-The SDK driver can be installed using pip: 
+The SDK can be installed using pip: 
 
 ```
 pip install intersystems-irispython
@@ -84,7 +84,7 @@ cursor.executemany(sql, params)
 SQLAlchemy is a Python SQL client which is supported by InterSystems. It can be installed with 
 
 ```
-pip install sqlalchemy-iris
+pip install "sqlalchemy-iris[intersystems]"
 ```
 
 This install the InterSystems specific SQLAlchemy driver, as well as the normal SQLAlchemy as a dependency. It is used as follows: 
