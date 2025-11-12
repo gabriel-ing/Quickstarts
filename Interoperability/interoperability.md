@@ -28,7 +28,8 @@ There are two other crutial components:
     - These contain the information being passed between the different components. 
 
 (Placeholder image)
-![alt text](image.png)
+
+![alt text](Images/InteropIntroPlaceholder.png)
 
 
 
@@ -38,7 +39,19 @@ Adapters - [Wide range of adapters available but also possible to create their o
 # Creating a simple Interoperability Production
 
 
-This guide walks through the creation of a simple code-first interoperability production to show how these productions can be built. 
+This guide walks through the creation of a simple code-first interoperability production to show how these productions can be built.
+
+ While this guide focuses more on the code underlying the production, its worth noting that a key value of the InterSystems IRIS Interoperability Production system is the productions can be configured, messages tracked and settings changed, within a low-code user interface. Therefore, alongside the code shown throughout this guide, the Production Configuration page of the management portal will also be shown, with various settings being configured from here. To access this page, go to: 
+
+ http://localhost:52773/csp/user/EnsPortal.ProductionConfig.zen?$NAMESPACE=USER& 
+
+ (Assuming the IRIS instance is mapped to local port 52773, and the production is in the user namespace).
+
+ Or navigate directly from the management portal homepage with: 
+
+Interoperability -> Configure -> Production -> GO 
+
+![Accessing Production Configuration](Images/AccessingProductionConfiguration.png)
 
 
 ## Design Brief:
@@ -52,7 +65,8 @@ The aim of this walkthrough is to design a system to process transactions. This 
 5. The Business Process checks if any of the updated stock values are less than 5, if so, sends a low-stock warning email.
 
 
-Interoperability productions are built from classes, as is standard within InterSystems IRIS. Each component is generally a separate class, unless there are multiple components w
+Interoperability productions are built from classes, as is standard within InterSystems IRIS. Each component is generally a separate class, unless there are multiple components 
+
 To build this production, we need the following components: 
 
 1. FromCSV Business Service
@@ -69,40 +83,137 @@ The transaction data is going to have the following:
 
 |ProductID|ProductName|Quantity|
 |-|-|-|
-|P123|Keyboard| 1|
-|P132|Montor| 2|
+|101|Keyboard| 1|
+|102|Monitor| 2|
 
+And the stock table will have the following details: 
+
+| DateLastSold | ProductId | ProductName    | Quantity |
+|--------------|-----------|----------------|----------|
+|              | 101       | Computer Mouse | 17       |
+|              | 102       | Monitor        | 13       |
+|              | 103       | Laptop         | 7        |
+
+
+
+An additional consideration is that there are many different parts to be built. The example being defined here has four different Business Hosts, two message type, a persistent class to create the data table, and the production setting file itself. While the order laid out in this guide is logical, it is by no means the only correct order to create an interoperability production. In fact, a similar guide available on the [developer community](https://community.intersystems.com/post/intersystems-iris-first-time-let%E2%80%99s-use-interoperability) used almost the exact reverse order.
 
 Each of these classes are going to be individually defined below, together with some details on the process behind their design. For the full coded example, see [final github link](). Alternative examples can be found at: [loan demo link](), [Reddit demo link]().
 
 
-## Transaction Request Message
+## Creating the StockQuantity database
 
-Messages are often a good place to begin when coding an interopability production. 
+Before starting to create our production, we will make the data table which stores our stock inforemation.
+
+To create the stock database, we can use a perisistent class. To keep it simple, we only need the ProductId,  ProductName, Quantity in stock, and date last sold. To make it easier to populate the table, we will also add a class method which creates a new object and saves it to the table. 
+
+```
+Class sample.StockTable Extends %Persistent
+{
+
+Property ProductId As %Integer [ Required ];
+
+// Set the Product ID to be the Index 
+Index ID On ProductId [ IdKey ];
+
+Property ProductName As %String;
+
+Property Quantity As %Integer [ Required ];
+
+Property DateLastSold As %DateTime;
+
+ClassMethod CreateNew(pid As %Integer, pName As %String, quantity As %Integer) As %Status
+{
+    // Create new item
+    set newItem = ##class(sample.StockTable).%New()
+
+    // Populate the information based on method call parameters
+    set newItem.ProductId = pid
+    set newItem.ProductName = pName
+    set newItem.Quantity = quantity
+
+    // Save the item 
+    set sc = newItem.%Save()
+}
+}
+
+```
+
+### Populating table 
+
+Now we have saved the above class, we can populate the table by running the following in the IRIS command line (ensure it is in the USER namespace): 
+
+```
+do ##class(sample.StockTable).CreateNew(101, "Computer Mouse", 17)
+do ##class(sample.StockTable).CreateNew(102, "Monitor", 13)
+do ##class(sample.StockTable).CreateNew(103, "Laptop", 7)
+do ##class(sample.StockTable).CreateNew(104, "Desktop PC", 11)
+do ##class(sample.StockTable).CreateNew(105, "Keyboard", 11)
+```
+
+Now, we can open the SQL Editor at [http://localhost:52773/csp/sys/exp/%25CSP.UI.Portal.SQL.Home.zen?$NAMESPACE=USER](http://localhost:52773/csp/sys/exp/%25CSP.UI.Portal.SQL.Home.zen?$NAMESPACE=USER) and view the table with:
+
+```
+SELECT 
+ID, DateLastSold, ProductId, ProductName, Quantity
+FROM sample.StockTable
+```
+Which outputs the following table 
+
+|  ID  | DateLastSold | ProductId | ProductName    | Quantity |
+|------|--------------|-----------|----------------|----------|
+| 101  |              | 101       | Computer Mouse | 17       |
+| 102  |              | 102       | Monitor        | 13       |
+| 103  |              | 103       | Laptop         | 7        |
+| 104  |              | 104       | Desktop PC     | 11       |
+| 105  |              | 105       | Keyboard       | 11       |
+
+
+# Creating the Production
+
+A good first step is creating the production, as this is required to add settings to the production components. To create a new production, open the [Production Configuration Portal](http://localhost:52773/csp/user/EnsPortal.ProductionConfig.zen?$NAMESPACE=USER&) and click `New` at the top of the page.
+
+![Production Configuration Portal](Images/ProductionConfiguration.png)
+
+You will be greated with the following pop-up.
+
+![Create Production Wizard](Images/CreateProductionWizard.png)
+
+The files for this guide are going to be saved in the sample.interop package, so this is a sensible place for the production to live. Enter `sample.interop` in the Package box. You can also give the production a name and description. The production name can be generic, e.g. "Production", and the description is optional, but it is always good practice to use names and descriptions that make it easier to understand what the production is for. 
+
+
+[naming conventions](https://docs.intersystems.com/iris20252/csp/docbook/DocBook.UI.Page.cls?KEY=EGBP_routing_best_practices#EGBP_naming_conventions)
+
+
+
+# Transaction Request Message
+
+Messages are often a good place to begin when coding an interopability production, because they define the information that passes between business hosts.
 
 Messages are generally stored in tables to allow them to be tracked and searched. For this reason, messsages should extend the `%Persistent` superclass to allow it to be saved to a database, as well as the `Ens.Request` or `Ens.Response` superclasses. 
 
-Messages are also recommended to extend `%XML.Adatper` as this allows the messages to be viewed in the management portal.
+Messages are also recommended to extend `%XML.Adatper` as this allows the messages to be viewed in XML format the management portal.
 
-We are going to simply create a message that has the columns within the original transaction CSV, as well as an additional value for Order ID, so the messages can be grouped by order ID in future.
+We are going to simply create a message that has the columns within the original transaction CSV, as well as an additional value for Order ID, so the messages can be grouped by order ID in future, and a DateTime value to keep track of the date at which the order was processed. 
 
 Note, we are making a design choice to send a single message for each row of the CSV file. This design makes sense as we can update the stock for each item in the transaction individually. In other systems however, it may make sense to include all the data in the original file as a single message. 
 
 ```
-Class sample.interop.TransactionMessage Extends (%Persistent, %Ens.Request, %XML.Adapter)
+Class sample.interop.TransactionMessage Extends (%Persistent, Ens.Request, %XML.Adaptor)
 {
+
     Property OrderId As %Integer;
 
-    Property DateTime As %Date
+    Property DateTime As %String;
 
     Property ProductId As %Integer;
 
-    Property ProductName As %String; 
-    
+    Property ProductName As %String;
+
     Property Quantity As %Integer;
+
 }
 ```
-
 
 We will also define a response message to return information on the current stock level from the business Operation. 
 
@@ -117,156 +228,8 @@ Class sample.interop.StockMessage Extends ( %Persistent, %Ens.Response, %XML.Ada
 }
 ```
 
-## Business Service
-
-The business service is the process which populates the transaction request message we have created. To do this, an **Inbound Adapter** is required. The adapter recieves the data coming into the production. Inbound adapters could recieve data from one of the following examples: 
-
-- Reading a file 
-- REST Request
-- Email 
-
-There are a wide number of inbound adapters availble, but its also possible to create custom adaptors using the Ens.InboundAdapter superclass. 
-
-The service class should extend the superclass `Ens.BusinessService` 
 
 
-```
-Class sample.interop.CsvFileService Extends Ens.BusinessService{
-
-Parameter ADAPTER = "Ens.File.InboundAdapter"
-
-Method OnProcessInput(pInput As %FileCharacterStrema, Output pOutput As %RegisteredObject) As %Status
-{
-    do ..Adapter.WorkPathSet("NewTransactions")
-    do ..Adapter.ArchivePathSet("ProcessedTransactions")
-
-    // Increment the Order ID
-    set OrderId = $Increment(^OrderCounter)
-    
-    // Read the headers line of the csv file
-    set headers = pInput.ReadLine()
-
-
-
-    while 'pInput.AtEnd{
-        set line = pInput.ReadLine()
-
-        // Create a new message for each transaction line
-        set msg = ##class(sample.interop.TransactionMessage)
-        
-        // Set the Order ID as the transaction order ID
-        set msg.OrderId = OrderId
-        
-        // Add the processing date and time in ODBC format
-        set msg.DateTime = $ZDATETIME($HOROLOG, 3)
-
-        // Set the values from the line of the csv file
-        set msg.ProductId = $Piece(line, ",", 1)
-        set msg.ProductName = $Piece(line, ",",2)
-        set msg.Quantity = $Piece(line, ",", 3) 
-
-        // Send Asynchronous request
-        set st=..SendRequestAsync(
-           "sample.interop.TransactionRouter", req)
-        if 'st $$$LOGERROR("Cannot call PrcMain Process for ProductID "_$Piece(line, ",", 1))
-    }
-
-}
-}
-```
-
-
-## Business Operations
-
-Business Operations perform the downstream functions that result from incoming messages. They do not need to be endpoints, as they can pass information back to the business host that called them, generally a business process. Business Operations can therefore be called to supply additional information to a business process by querying a database. In this example, we are going to implement two business operations, updating the item stock databases, and sending low-stock warning. 
-
-The Updating Stock operation therefore has two way information flow, as the result of this operation is returned to the business process. The low-stock warning operation has a single direction inforamtion flow, as information does not need to be sent back to the business process. 
-
-A Business Operation requires a message map, this is an XML specification which defines what method is called depending on the type of message calling the operation. In this way, a business operation class could have different functionality in response to different incoming messages.  
-
-
-### Updating Stock
-
-
-```
-Class sample.interop.ToUpdateStockDB Extends Ens.BusinessOperation{
-
-    XData MessageMap
-    {
-    <MapItems>
-        <MapItem MessageType="sample.interop.TransactionMessage">
-            <Method>
-                UpdateDatabase
-            </Method>
-        </MapItem>
-    </MapItems>
-    }
-    
-    Method UpdateDatabase(pReq As sample.interop.TransactionMessage, Output pResp As sample.interop.StockMessage) As %Status
-    {
-        // Open the stock item in the database
-        set stockItem = ##class(sample.StockTable).%OpenId(pReq.ProductId)
-
-        // Update the current stock
-        set stockItem.CurrentStock = stockItem.CurrentStock - pReq.quantity
-        
-        // Update the last sale date
-        set stockItem.LastSale = pReq.Datetime
-        
-        // Save the edited item
-        set stockItem.%Save()
-
-        // Create and populate the response message
-        set pResp = ##class(sample.interop.StockMessage).%New()
-
-        set pResp.CurrentStock = stockItem.CurrentStock
-        set pResp.ProductId = pReq.ProductId
-        set pResp.ProductName = pReq.ProductName
-
-        quit $$$OK
-    }
-
-}
-```
-
-### Mail Operation
-
-```
-Class sample.interop.ToEmail Extends Ens.BusinessOperation
-{
-    Parameter ADAPTER + "EnsLib.EMail.OutboundAdapter"
-
-    XData MessageMap
-    {
-    <MapItems>
-        <MapItem MessageType="sample.interop.TransactionMessage">
-            <Method>
-                SendEmail
-            </Method>
-        </MapItem>
-    </MapItems>    
-    }
-
-    Method SendEmail(pReq As sample.interop.TransactionMessage, Output pResp as Ens.Response) As %Status
-    {
-        set email = ##class(%New.MailMessage).%New()
-        
-        set emailText = "Warning! Stock for "_pReq.ProductName_" (ProductID: "_pReq.ProductId_") Is running low. Currently, there are only "_pReq.Quantity_" Units left in stock.
-
-        do email.TextData.Write(emailText)
-
-        set emailSubject = "Stock Warning PID: "_pReq.ProductId
-        set email.subject(emailSubject)
-
-        set tSc ..Adapter.SendMail(email)
-
-        if '$$$ISOK(tSc) $$$LOGERROR("Email Send Fail")
-        
-        quit tSc
-        }
-
-}
-```
 
 ## Business Process
 
@@ -319,69 +282,6 @@ Class sample.interop.ProcessTransactionRouterRules Extends Ens.Rule.Definition
 }
 ```
 
-## Creating the StockQuantity database
-
-To create the stock quantity database, we can use a perisistent class. To keep it simple, we only need the ProductId,  ProductName, Quantity in stock, and date last sold. To make it easier to populate the table, we will also add a class method which creates a new object and saves it to the table. 
-
-```
-Class sample.StockTable Extends %Persistent
-{
-Property ProductId As %Integer [ Required ];
-
-Property ProductName As %String;
-
-Property Quantity As %Integer [ Required ];
-
-Property DateLastSold As %Date;
-
-ClassMethod CreateNew(pid As %Integer, pName As %String, quantity As %Integer) As %Status
-{
-        set newItem = ##class(sample.StockTable).%New()
-        set newItem.ProductId = pid
-        set newItem.ProductName = pName
-        set newItem.Quantity = quantity
-        set sc = newItem.%Save()
-}
-
-}
-
-```
-
-### Populating table 
-
-Now we have saved the above class, we can populate the table by running the following in the IRIS command line (ensure it is in the USER namespace): 
-
-```
-do ##class(sample.StockTable).CreateNew(101, "Computer Mouse", 17)
-do ##class(sample.StockTable).CreateNew(102, "Monitor", 13)
-do ##class(sample.StockTable).CreateNew(103, "Laptop", 7)
-do ##class(sample.StockTable).CreateNew(104, "Desktop PC", 11)
-do ##class(sample.StockTable).CreateNew(105, "Keyboard", 11)
-```
-
-Now, we can open the SQL Editor at [http://localhost:52773/csp/sys/exp/%25CSP.UI.Portal.SQL.Home.zen?$NAMESPACE=USER](http://localhost:52773/csp/sys/exp/%25CSP.UI.Portal.SQL.Home.zen?$NAMESPACE=USER) and view the table with:
-
-```
-SELECT 
-ID, DateLastSold, ProductId, ProductName, Quantity
-FROM sample.StockTable
-```
-and, all being well, the following table should exist: 
-
-|  ID  | DateLastSold | ProductId | ProductName    | Quantity |
-|------|--------------|-----------|----------------|----------|
-| 101  |              | 101       | Computer Mouse | 17       |
-| 102  |              | 102       | Monitor        | 13       |
-| 103  |              | 103       | Macbook        | 7        |
-| 104  |              | 104       | Desktop PC     | 11       |
-| 105  |              | 105       | Keyboard       | 11       |
 
 
-## Creating the Production
 
-
-![alt text](image-1.png)
-![alt text](image-2.png)
-
-
-[naming conventions](https://docs.intersystems.com/iris20252/csp/docbook/DocBook.UI.Page.cls?KEY=EGBP_routing_best_practices#EGBP_naming_conventions)

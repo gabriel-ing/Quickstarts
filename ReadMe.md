@@ -17,18 +17,26 @@ Currently have first drafts of:
 
 WIP:
 - [Interoperability](Interoperability/interoperability.md)
+    - Having created the simplest example I could think of, I've concluded that a "quickstart" guide might not be so quick.
+    - Currently working to split up the Interoperability quickstart into:
+        - Business Service
+        - Business Operations
+        - Business Process
+        - Messages 
+        - Tracking Messages, Testing and Debugging? 
+    - I picture these being some kind of sequence of pages or maybe different tabs of the same page? 
 
 Below is the suggested list of quickstarts still to be written: 
 
 By me: 
-    - node.js
-    - Web development / csp? 
+- node.js
+- Web development / csp? 
 
 
 By Others:
-    - Java
-    - .NET
-    - Analytics
+- Java
+- .NET
+- Analytics
 
 
 As an aside, this is a nice feature of the vector search documentation page: 
