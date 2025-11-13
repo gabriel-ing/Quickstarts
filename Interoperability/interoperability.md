@@ -2,27 +2,21 @@
 
 Interoperability is the ability for systems and devices to seamlessly interact, work together and exchange information across different platforms and standards. 
 
-An example of an interoperability system is an automated loan application checking service. A user submits an application, leading to automated queries to different loan providers to check what loan they could provide. Finally the interoperable system might provide a response to the user in the form of sending an email. At several points in this system, there may be rules-based processes, e.g. to check the outcome of a loan request before writing an acceptance or denial email. 
-
 In InterSystems IRIS, an interoperable system, or production, is completed by three main process types: 
 
 - Business Services
     - Responsible for recieving incoming signals.
-    - Loan example: the Business Service would recieve the data from the submitted form.
-
 - Business Processes
     - Responsible for conditional routing of messages, as well as required transformations of data. 
-    - Loan example: Processes would send the required data to operations to check different loan providers, and apply conditional logic to call acceptance or rejection email operations.
-
 - Business Operations
-    - Responsible for Downstream processes, this may include intermediate processes like querying a database before the final outputs.
-    - Loan example: Responsible for querying loan providers and sending decision email.
+    - Responsible for Downstream processes including information being sent to external applications. Business Operations may also be intermediate processes like querying a database, where the response is passed back to a business process before the final outputs.
+
 
 There are two other crutial components: 
 
-- Adapters 
-    - These are connectors that help read input data (inbound adaptors) or create output data in a suitable format (outbound adaptors).
-    - Loan example: A JSON adapter may read data that has been submitted via POST request to a REST endpoint. 
+- Adaptors 
+    - These are connectors that help receive input data (inbound adaptors) or pass on output in a suitable format (outbound adaptors). 
+    - There are many pre-configured adaptors, including file reading and writing, sending and receiving emails, querying external databases and using common transfer protocols like REST, SOAP or TCP. For more info, see the [extended list of pre-configured adapters](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=EGIN_options_connectivity).
 
 - Messages
     - These contain the information being passed between the different components. 
@@ -33,15 +27,13 @@ There are two other crutial components:
 
 
 
-Adapters - [Wide range of adapters available but also possible to create their own](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=EGIN_options_connectivity).
-
 
 # Creating a simple Interoperability Production
 
 
 This guide walks through the creation of a simple code-first interoperability production to show how these productions can be built.
 
- While this guide focuses more on the code underlying the production, its worth noting that a key value of the InterSystems IRIS Interoperability Production system is the productions can be configured, messages tracked and settings changed, within a low-code user interface. Therefore, alongside the code shown throughout this guide, the Production Configuration page of the management portal will also be shown, with various settings being configured from here. To access this page, go to: 
+While this guide focuses more on the code underlying the production, its worth noting that a key value of the InterSystems IRIS Interoperability Production system is the productions can be configured, messages tracked and settings changed, within a low-code user interface. Therefore, alongside the code shown throughout this guide, the Production Configuration page of the management portal will also be shown, with various settings being configured from here. To access this page, go to: 
 
  http://localhost:52773/csp/user/EnsPortal.ProductionConfig.zen?$NAMESPACE=USER& 
 
@@ -58,9 +50,9 @@ Interoperability -> Configure -> Production -> GO
 
 The aim of this walkthrough is to design a system to process transactions. This system will be very simple, but will guide the process of building a simple interoperability production with InterSystems IRIS. The process is as follows: 
 
-1. A transaction is initialized by a csv file with the order details being added to the Transactions folder.
+1. A transaction is initialized by a CSV file with the order details being added to the Transactions `InFile` folder.
 2. Business service reads the transaction data (via an Inbound adapter) and sends a request to a Business Process
-3. The Business process sends a request to a Business Operation to update stock. 
+3. The Business process sends a request to a Business Operation to update the stock database. 
 4. The Business Operation sends a response with the updated stock values.
 5. The Business Process checks if any of the updated stock values are less than 5, if so, sends a low-stock warning email.
 
@@ -69,15 +61,15 @@ Interoperability productions are built from classes, as is standard within Inter
 
 To build this production, we need the following components: 
 
-1. FromCSV Business Service
-2. Transaction Routing Business Process
-3. Stock updating Business Operation
-4. Low-Stock email Business Operation
+1. `FromCSV` Business Service
+2. `ProcessTransactionRouter` Business Process
+3. `ToUpdateStock` Business Operation
+4. `ToEmail` Business Operation
 
 And the following messages: 
 
-1. Transaction Request. This can be reused between the business service and the business process, and between the business process and the stock updating business operation.
-2. Updated stock response.
+1. `TransactionMessage` Request. This can be reused between the business service and the business process, and between the business process and the stock updating business operation.
+2. `StockMessage` Response. This is a response message that sends data back from the database (Business Operation) to the business class.
 
 The transaction data is going to have the following: 
 
@@ -96,14 +88,28 @@ And the stock table will have the following details:
 
 
 
-An additional consideration is that there are many different parts to be built. The example being defined here has four different Business Hosts, two message type, a persistent class to create the data table, and the production setting file itself. While the order laid out in this guide is logical, it is by no means the only correct order to create an interoperability production. In fact, a similar guide available on the [developer community](https://community.intersystems.com/post/intersystems-iris-first-time-let%E2%80%99s-use-interoperability) used almost the exact reverse order.
+### Build Order 
+The components can be built in any order, but some general rules for ordering the build are:
+1. Its good to build messages early on, because all components will need to interact with messages. 
+2. Building back to front is often preferable because you can test Business Operations and Processes using dummy messages with the Testing features. 
 
-Each of these classes are going to be individually defined below, together with some details on the process behind their design. For the full coded example, see [final github link](). Alternative examples can be found at: [loan demo link](), [Reddit demo link]().
+As such, this guide is ordered in the following order: 
+- The Table of Stock Data (`StockTable`)
+- Messages (`TransactionMessage` and `StockMessage`)
+- Business Operations (`ToUpdateStock` and `ToEmail`)
+- Business Process (`ProcessTransactionRouter`)
+- Business Service (`FromCSV`)
+
+There is no reason why this couldn't be built in any other order, but the testing facilities work best in this order, meaning you can ensure each component works before building the next component. Feel free to skip to the pages for any component you are interested in though. 
+
+An additional consideration is that there are many different parts to be built. The example being defined here has four different Business Hosts, two message type, a persistent class to create the data table, and the production setting file itself. While the order laid out in this guide is logical, it is by no means the only correct order to create an interoperability production. In fact,  used almost the exact reverse order.
+
+Each of these classes are going to be individually defined below, together with some details on the process behind their design. For the full coded example, see [final github link](). Alternative examples can be found at: [Reddit demo link](https://github.com/intersystems-community/iris-interoperability-template/tree/master) and a similar guide available on the [developer community](https://community.intersystems.com/post/intersystems-iris-first-time-let%E2%80%99s-use-interoperability)
 
 
-## Creating the StockQuantity database
+## Creating the Stock Database
 
-Before starting to create our production, we will make the data table which stores our stock inforemation.
+Before starting to create our production, we will make the data table which stores our stock information.
 
 To create the stock database, we can use a perisistent class. To keep it simple, we only need the ProductId,  ProductName, Quantity in stock, and date last sold. To make it easier to populate the table, we will also add a class method which creates a new object and saves it to the table. 
 
@@ -231,56 +237,7 @@ Class sample.interop.StockMessage Extends ( %Persistent, %Ens.Response, %XML.Ada
 
 
 
-## Business Process
 
-Now we have the functions at either end of the production, the next to do is connect them using a conditional routing process. The rules behind the message routing are simple. When a message arrives, the `ToUpdateStockDB` operation needs to be called synchronously to recieve the output of the new stock number. If the resulting stock is low, in this example we shall put a limit of 5 units, the business process sends an additional call to `ToEmail`. 
-
-The easiest way to create business processes is using Business Process Langauge, which defines rules in XML data, but can be easily built using the graphical user interface (GUI) in the management portal.
-
-
-```xml
-Class sample.interop.ProcessTransactionRouterRules Extends Ens.Rule.Definition
-{
-    Parameter RuleAssistClass = "EnsLib.MsgRouter.RuleAssist"
-
-    XData RuleDefinition [ XMLNamespace = "http://www.intersystems.com/rule ]
-    {
-    <ruleDefinition alias="" context="EnsLib.MsgRouter.RoutingEngine" production="sample.interop.Production">
-    <ruleSet name="" effectiveBegin="" effectiveEnd="">
-    <rule name="">
-    <constraint name="msgClass" value="sample.interop.TransactionMessage"></constraint>
-    <call name="CallUpdateStockDB" target="sample.interop.ToUpdateStockDB" async=0>
-        <request type="sample.interop.TransactionMessage">
-            <assign property="callrequest.ProductId" value="request.ProductId" action="set" />
-            <assign property="callrequest.ProductName" value="request.ProductName" action="set" />
-            <assign property="callrequest.Datetime" value="request.Datetime" action="set" />
-            <assign property="callrequest.Quantity" value="request.ProductQuantity" action="set" />
-        </request>
-        <response type="sample.interop.StockMessage">
-            <assign property="context.Stock" value="callresponse.CurrentStock" action="set" />
-            <assign property="context.ProductId" value="callresponse.ProductId" action="set"/>
-            <assign property="context.ProductName" value="callresponse.ProductName" action="set"/>
-        </response>
-    </call>
-
-    <if condition="context.Stock &lt; 5">
-        <true>
-            <call name="CallToEmail" type="sample.interop.ToEmail">
-                <request type="sample.interop.TransactionMessage">
-                    <assign property="callrequest.ProductID" value="context.ProductId" action="set"/>
-                    <assign property="callrequest.ProductName" value="context.ProductName" action="set"/>
-                    <assign property="callrequest.Quantity" value="context.Stock" action="set"/>
-                </request>
-            </call>
-        </true>
-    </if>
-    <return></return>
-    </rule>
-    </ruleSet>
-    </ruleDefinition>
-    }
-}
-```
 
 
 

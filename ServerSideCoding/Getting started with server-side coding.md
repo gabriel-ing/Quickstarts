@@ -8,7 +8,7 @@ This guide is meant to be a one-stop reference guide to IRIS classes and coding 
 - [Introduction to ObjectScript](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=GCOS_intro)
 - [Introduction to Embedded Python](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=AFL_epython)
 
-## ObjectScript Vasucs
+## ObjectScript Basics
 
 - ObjectScript is a weakly typed language, meaning the type of variable is not defined in the code. 
 - Standard operators are not case sensitive, variable names are all case sensitive.
@@ -56,9 +56,9 @@ if (n = 1){
 }
 
 // Inline conditional
-// <command>:<condition> 
+// <command>:<condition> variable
 
-write:n=1 "One" // Prints "One"
+write:n=1 "One" // Prints "One" because n=1
 write:n=2 "Two" // Does not write anything as conditional not fulfilled
 
 
@@ -91,7 +91,7 @@ Class packagename.ClassName Extends %Persistent
 	// A Parameter is a constant
 	// Its standard practice to use all caps for parameters
 	
-	// A Class Method which is called directly from the class
+	// A Class Method is called directly from the class, without needing to be instantiated
 	// Takes two integers in, returns a string out
 	ClassMethod AddNums(param1 As %Integer, param2 As %Integer) As %String
 	{
