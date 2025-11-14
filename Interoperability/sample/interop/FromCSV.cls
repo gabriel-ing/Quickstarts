@@ -1,9 +1,19 @@
-Class sample.interop.CsvFileService Extends Ens.BusinessService
+Class sample.interop.FromCSV Extends Ens.BusinessService
 {
+
+// Define the Inbound Adapter
 
 Parameter ADAPTER = "EnsLib.File.InboundAdapter";
 
-Method OnProcessInput(pInput As %FileCharacterStream, Output pOutput As %RegisteredObject) As %Status
+// Create a property for the message target (i.e. where the messages will be sent)
+
+Property MessageTarget As %String;
+
+// Add the message Target to message settings. 
+
+Parameter SETTINGS = "MessageTarget:Basic";
+
+Method OnProcessInput(pInput As %Stream.FileCharacter) As %Status
 {
     // Increment the Order ID
     set OrderId = $Increment(^OrderCounter)
@@ -33,10 +43,10 @@ Method OnProcessInput(pInput As %FileCharacterStream, Output pOutput As %Registe
         set msg.Quantity = +$ZStrip(Quantity, "*W")
 
         // Send Asynchronous request
-        set st=..SendRequestAsync("sample.interop.BPWizardRouter", msg)
+        set st=..SendRequestAsync(..MessageTarget, msg)
 
         if ('st){
-        $$$LOGERROR("Cannot call PrcMain Process for ProductID "_$Piece(line, ",", 1))
+        $$$LOGERROR("Cannot call Process for ProductID "_$Piece(line, ",", 1))
         }
         
     }

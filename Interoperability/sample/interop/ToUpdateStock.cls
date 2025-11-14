@@ -24,14 +24,12 @@ Method UpdateDatabase(pReq As sample.interop.TransactionMessage, Output pResp As
         // Save the edited item
         set sc = stockItem.%Save()
 
-        if 'sc{
-            $$$LOGERROR("Error Saving stockItem")
-            $$$LOGERROR(##class(%SYSTEM.Status).GetErrorText(sc))
-            quit
-        }
-        // Create and populate the response message
-        set pResp = ##class(sample.interop.StockMessage).%New()
+        // Log Error message if it fails to save
+        if 'sc $$$LOGERROR(##class(%SYSTEM.Status).GetErrorText(sc))
 
+        // Create the response message
+        set pResp = ##class(sample.interop.StockMessage).%New()
+        // Populate the response message
         set pResp.CurrentStock = stockItem.Quantity
         set pResp.ProductId = pReq.ProductId
         set pResp.ProductName = pReq.ProductName
