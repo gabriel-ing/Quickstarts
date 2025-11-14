@@ -14,9 +14,9 @@ In InterSystems IRIS, an interoperable system, or production, is completed by th
 
 There are two other crutial components: 
 
-- Adaptors 
-    - These are connectors that help receive input data (inbound adaptors) or pass on output in a suitable format (outbound adaptors). 
-    - There are many pre-configured adaptors, including file reading and writing, sending and receiving emails, querying external databases and using common transfer protocols like REST, SOAP or TCP. For more info, see the [extended list of pre-configured adapters](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=EGIN_options_connectivity).
+- Adapters 
+    - These are connectors that help receive input data (inbound adapters) or pass on output in a suitable format (outbound adapters). 
+    - There are many pre-configured adapters, including file reading and writing, sending and receiving emails, querying external databases and using common transfer protocols like REST, SOAP or TCP. For more info, see the [extended list of pre-configured adapters](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=EGIN_options_connectivity).
 
 - Messages
     - These contain the information being passed between the different components. 
@@ -26,12 +26,10 @@ There are two other crutial components:
 ![alt text](Images/InteropIntroPlaceholder.png)
 
 
-
-
 # Creating a simple Interoperability Production
 
 
-This guide walks through the creation of a simple code-first interoperability production to show how these productions can be built.
+This guide walks through the creation of a basic code-first interoperability production to show how these productions can be built.
 
 While this guide focuses more on the code underlying the production, its worth noting that a key value of the InterSystems IRIS Interoperability Production system is the productions can be configured, messages tracked and settings changed, within a low-code user interface. Therefore, alongside the code shown throughout this guide, the Production Configuration page of the management portal will also be shown, with various settings being configured from here. To access this page, go to: 
 
@@ -57,7 +55,7 @@ The aim of this walkthrough is to design a system to process transactions. This 
 5. The Business Process checks if any of the updated stock values are less than 5, if so, sends a low-stock warning email.
 
 
-Interoperability productions are built from classes, as is standard within InterSystems IRIS. Each component is generally a separate class, unless there are multiple components 
+Interoperability productions are built from classes, as is standard within InterSystems IRIS. Each component is generally a separate class, unless there are multiple instances of the same class, potentially with different settings (e.g. two file-reading Business Services that read from different directories).
 
 To build this production, we need the following components: 
 
@@ -70,6 +68,15 @@ And the following messages:
 
 1. `TransactionMessage` Request. This can be reused between the business service and the business process, and between the business process and the stock updating business operation.
 2. `StockMessage` Response. This is a response message that sends data back from the database (Business Operation) to the business class.
+
+We also need to build the table which stores our stock data. 
+
+Again, every one of these components, including the message classes and the data table, are InterSystems IRIS classes. In fact, the production itself is also an Intersystems IRIS class, although is usually only seen as a UI. 
+
+The functionality of these classes will be written in a mix of ObjectScript and XML. For an introduction on the basics of InterSystems IRIS classes and ObjectScript, see [Getting Started with Server-side coding](../ServerSideCoding/Getting%20started%20with%20server-side%20coding.md)
+
+
+### Data Format
 
 The transaction data is going to have the following: 
 
@@ -86,7 +93,13 @@ And the stock table will have the following details:
 |              | 102       | Monitor        | 13       |
 |              | 103       | Laptop         | 7        |
 
+### Interoperability Value
 
+Using an Interoperability production for such a simple example does add unneccessary complexity, however the value of interoperability productions is to create complex systems where every interaction between components is tracked and logged. The in-build ability to examine the content of every message request and response makes it much easier to identify errors and bugs in the process, and quickly recognise and disable broken features. 
+
+Furthermore, this is all performed in the context of InterSystems IRIS's secure and reliable systems. Once developed, much of the process, including building new productions with existing components, can be done in a low-code environment, so can be handled by non-developers. Settings can also be changed and components disabled while the production is operating. 
+
+So while this guide does overcomplicate a relatively straight-forward process, it is designed to explain how complex systems can be built piece-by-piece.
 
 ### Build Order 
 The components can be built in any order, but some general rules for ordering the build are:
@@ -95,6 +108,7 @@ The components can be built in any order, but some general rules for ordering th
 
 As such, this guide is ordered in the following order: 
 - The Table of Stock Data (`StockTable`)
+- Initialising the production
 - Messages (`TransactionMessage` and `StockMessage`)
 - Business Operations (`ToUpdateStock` and `ToEmail`)
 - Business Process (`ProcessTransactionRouter`)
@@ -109,7 +123,7 @@ Each of these classes are going to be individually defined below, together with 
 
 ## Creating the Stock Database
 
-Before starting to create our production, we will make the data table which stores our stock information.
+Before starting to create our production, we will make the data table which our stock information.
 
 To create the stock database, we can use a perisistent class. To keep it simple, we only need the ProductId,  ProductName, Quantity in stock, and date last sold. To make it easier to populate the table, we will also add a class method which creates a new object and saves it to the table. 
 
@@ -183,56 +197,68 @@ A good first step is creating the production, as this is required to add setting
 
 You will be greated with the following pop-up.
 
-![Create Production Wizard](Images/CreateProductionWizard.png)
+![Create Production Wizard](Images/CreatingProductionWizard.png)
 
 The files for this guide are going to be saved in the sample.interop package, so this is a sensible place for the production to live. Enter `sample.interop` in the Package box. You can also give the production a name and description. The production name can be generic, e.g. "Production", and the description is optional, but it is always good practice to use names and descriptions that make it easier to understand what the production is for. 
 
 
-[naming conventions](https://docs.intersystems.com/iris20252/csp/docbook/DocBook.UI.Page.cls?KEY=EGBP_routing_best_practices#EGBP_naming_conventions)
+The production is saved within an XML block in an IRIS class sharing the name of the production. The settings can be directly changed within this XML data, though it is generally easier to use the management portal. 
 
+### Production Class
 
+For reference, this is the completed production class including all the components in the process and the settings selected: 
 
-# Transaction Request Message
-
-Messages are often a good place to begin when coding an interopability production, because they define the information that passes between business hosts.
-
-Messages are generally stored in tables to allow them to be tracked and searched. For this reason, messsages should extend the `%Persistent` superclass to allow it to be saved to a database, as well as the `Ens.Request` or `Ens.Response` superclasses. 
-
-Messages are also recommended to extend `%XML.Adatper` as this allows the messages to be viewed in XML format the management portal.
-
-We are going to simply create a message that has the columns within the original transaction CSV, as well as an additional value for Order ID, so the messages can be grouped by order ID in future, and a DateTime value to keep track of the date at which the order was processed. 
-
-Note, we are making a design choice to send a single message for each row of the CSV file. This design makes sense as we can update the stock for each item in the transaction individually. In other systems however, it may make sense to include all the data in the original file as a single message. 
-
-```
-Class sample.interop.TransactionMessage Extends (%Persistent, Ens.Request, %XML.Adaptor)
+```xml
+Class sample.interop.Production Extends Ens.Production
 {
 
-    Property OrderId As %Integer;
-
-    Property DateTime As %String;
-
-    Property ProductId As %Integer;
-
-    Property ProductName As %String;
-
-    Property Quantity As %Integer;
-
-}
-```
-
-We will also define a response message to return information on the current stock level from the business Operation. 
-
-```
-Class sample.interop.StockMessage Extends ( %Persistent, %Ens.Response, %XML.Adapter)
+XData ProductionDefinition
 {
-    Property ProductID As %Integer;
+<!-- Production definition -->
+<Production Name="sample.interop.Production" LogGeneralTraceEvents="false">
+  <Description></Description>
+  <ActorPoolSize>2</ActorPoolSize>
 
-    Property ProductName As %Integer; 
+    <!-- Business Operation 1 -->
+  <Item Name="sample.interop.ToUpdateStock" Category="" ClassName="sample.interop.ToUpdateStock" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  </Item>
 
-    Property CurrentStock As %Integer;
+    <!-- Business Operation 2 -->
+  <Item Name="sample.interop.ToEmail" Category="" ClassName="sample.interop.ToEmail" PoolSize="1" Enabled="false" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+
+    <!-- Outbound Email Adapter Settings -->
+    <Setting Target="Adapter" Name="Credentials">Gmail</Setting>
+    <Setting Target="Adapter" Name="From">FirstName.LastName@gmail.com</Setting>
+    <Setting Target="Adapter" Name="Recipient">warehouse@example.com</Setting>
+    <Setting Target="Adapter" Name="SMTPPort">465</Setting>
+    <Setting Target="Adapter" Name="SMTPServer">smtp.gmail.com</Setting>
+    <Setting Target="Adapter" Name="SSLConfig">SSLConfig</Setting>
+
+  </Item>
+
+    <!-- Business Process -->
+  <Item Name="sample.interop.TransactionProcessRouter" Category="" ClassName="sample.interop.TransactionProcessRouter" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  </Item>
+
+    <!-- Business Service-->
+  <Item Name="sample.interop.FromCSV" Category="" ClassName="sample.interop.FromCSV" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+    
+    <!-- Configurable Business Service Setting-->
+    <Setting Target="Host" Name="MessageTarget">sample.interop.TransactionProcessRouter</Setting>
+
+    <!-- Inbound File Reader Adapter Settings-->
+    <Setting Target="Adapter" Name="ArchivePath">/home/irisowner/ProcessedFiles</Setting>
+    <Setting Target="Adapter" Name="FilePath">/home/irisowner/fileInput</Setting>
+    <Setting Target="Adapter" Name="FileSpec">*.csv</Setting>
+  </Item>
+
+</Production>
 }
+}
+
 ```
+
+
 
 
 
