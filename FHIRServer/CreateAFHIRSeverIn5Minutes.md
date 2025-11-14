@@ -1,10 +1,10 @@
 # Create a FHIR Server in 5 minutes with IRIS Health Community
 
-This article provides a programatic way to rapidly create a local FHIR server with the Community edition of IRIS Health, pre-loaded with synthetic data from Synthea. 
+This article provides a programatic way to rapidly create a FHIR server with InterSystems IRIS For Health, pre-loaded with synthetic data from Synthea. 
 
-The only requirement for this is having [Docker](https://www.docker.com/) installed. While I include instructions for downloading IRIS Health Community locally with docker, the rest of the process would apply to any other instance of IRIS Health.
+This guide is based on using the InterSystems IRIS for Health Community Edition, which can be downloaded and run with docker. For full installation instructions, see [Getting Started with InterSystems IRIS Community Edition](GettingStartedWithIRISCommunity\GettingStartedWithIRISCommunity.md). The command to download and run this is included below, but the instructions are limited. The general process can be followed with any other instance of InterSystems IRIS For Health. 
 
-## Create Synthetic data
+## Optional: Create Synthetic data
 
 Before setting up IRIS health and the FHIR Server, we can create synthetic data with [Synthea](https://synthetichealth.github.io/synthea/). The [InterSystems Developer Community](https://github.com/intersystems-community/irisdemo-base-synthea/tree/master) has helpfully created a docker image to simplify this process to a single command:
 
@@ -14,49 +14,28 @@ docker run --rm -v $PWD/output:/output --name synthea-docker intersystemsdc/iris
 
 This creates a folder in the current directory called `output`, it then runs Synthea to create 100 patient records (`-p 100`). The docker container is removed when the process is finished, leaving 100 patient records in `output/fhir`.
 
-## Download IRIS Health Community
+## Run InterSystems IRIS Health Community
 
-To download and run IRIS health community edition with docker , you can just run: 
+To download and run IRIS health community edition with docker , you can use the following command. For more information see the [full InterSystems IRIS Community Edition set-up guide](GettingStartedWithIRISCommunity\GettingStartedWithIRISCommunity.md).
 ```
 docker run -d --name iris-health-community --publish 1972:1972 --publish 52773:52773 -v $PWD/output:/usr/irissys/output intersystems/irishealth-community:latest-em
 ```
 
-To break this down:
-
-- `docker run` Runs a docker image. If you have not downloaded the image, it will automatically do so. 
-- `--name` gives running container a name (iris-health-community) 
-- The IRIS Health Community ports 1972 and 52773 have been mapped to the equivalent local ports (`--publish <local>:<container>`).
-- The `output` directory containing the FHIR data has been mounted to the IRIS health container with the `-v $PWD/output:/usr/irissys/output` flag. 
-- `-d` flag detaches the terminal, meaning we can carry on using the same terminal window.
-- `intersystems/irishealth-community` is the docker image being downloaded from [docker hub](https://hub.docker.com/r/intersystems/iris-ml-community)
-
-
-
 ## Create FHIR Server
 
-Start an IRIS terminal: 
+Start an IRIS terminal - if you are using docker as suggested above, you can run the following command. Otherwise, you can open an IRIS terminal in a number of ways, including from [VS Code](DevelopmentEnvironment\DevelopmentEnvironmentSet-up.md). 
 
 ```
 docker exec -it iris-health-community iris session iris
 ``` 
-
-#### Unexpire passwords
-
-By default, Community editions of IRIS health have the password SYS for every account, but these have expired, meaning you will be prompted to change the passwords on first login with the management portal. Authorization with other methods might fail due to an unexpired password. Obviously, this is only suitable for development environments, while authorization should be more robust for production environments.
-
-```
-set $NAMESPACE = "%SYS"
-do ##class(Security.Users).UnExpireUserPasswords("*")
-```
-
 
 #### Create a new namespace for your FHIR server
 
 
 ```
 set $NAMESPACE = "HSLIB"
-do:'##class(%SYS.Namespace).Exists("fhir") ##class(HS.Util.Installer.Foundation).Install("fhir")
-set $NAMESPACE = "fhir"
+do:'##class(%SYS.Namespace).Exists("fhirdemo") ##class(HS.Util.Installer.Foundation).Install("fhirdemo")
+set $NAMESPACE = "fhirdemo"
 ```
 
 #### Install the FHIR server
@@ -161,8 +140,8 @@ print(res.json())
 Cross-Origin Resource Sharing (CORS) is a security feature in modern web browsers. While a complete discussion of CORS is beyond the scope of this guide, the ObjectScript commands below sets the CORS configuration to allow all domains, HTTP methods, common headers and credentials. This set-up may be helpful in development environments, particularly for web development, but should be more carefully considered for production environments. 
 
 ```
-// Switch to the "fhir" namespace where the FHIR server is running
-set $NAMESPACE = "fhir"
+// Switch to the "fhirdemo" namespace where the FHIR server is running
+set $NAMESPACE = "fhirdemo"
 
 // Define the CORS configuration name
 set configName = "%CSP.CORS"

@@ -1,7 +1,8 @@
+# Getting Started with Server Side Code
 
-A major benefit of the InterSystems core technology IRIS is its ability to run server-side code. This allows operations involving the data, to be run directly on the data, without having to move or copy the data.  As a result, InterSystems is a market leader in speed of processing, enabling rapid data processes, real-time analytics, faster machine learning and many more great features. 
+A major benefit of the InterSystems core technology IRIS is its ability to run code in the same location, or on the same server, as the databases. This ability allows operations involving the data, to be run directly on the data, without having to move or copy the data. As a result, InterSystems IRIS is a market leader in speed of processing. As a result, InterSystems IRIS, and the technology built with it,  enables rapid data processes, real-time analytics, faster machine learning and many more great features. 
 
-IRIS runs on Object-oriented code within Classes. The functions within the classes are called methods and are written in Embedded languages - ObjectScript and Python. 
+InterSystems IRIS runs on Object-oriented code within Classes. The functions within the classes are called methods and are written in Embedded languages - ObjectScript and Python. 
 
 This guide is meant to be a one-stop reference guide to IRIS classes and coding with ObjectScript and embedded Python for experienced developers. For comprehensive documentation, see the relevant sectons of documentation: 
 - [Basic Ideas in Class Programming](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=GOBJ_intro)
@@ -85,7 +86,7 @@ Class packagename.ClassName Extends %Persistent
 	Property VariableName As %String [Required]; 
 	// A property is a persistent variable.  
 	// As %String states that the property is a string
-	// Required is a keyword argument. An object cannot be saved without this value
+	// Required is a keyword argument, meaning the object cannot be saved without this variable
 	
 	Parameter CONSTANT = 2;
 	// A Parameter is a constant
@@ -156,7 +157,7 @@ A method can be used from an object:
 write object.FizzBuzz(1, 2)
 ```
 
-Print the following to the console
+Print the following:
 ```
 1
 Hello World // (Variable name set above)
@@ -167,7 +168,7 @@ Buzz
 ```
 
 
-#### Persistent classes 
+### Persistent classes 
 
 A `%Persistent` class is a class that can be saved directly into the database. They can be used in the following way:
 
@@ -276,8 +277,8 @@ Installs `numpy` to the Intersystems IRIS install location. For help locating th
 
 You can then use `numpy` as you would in regular Python scripts:  
 ```python
-ClassMethod NumpyExample() [langauge=python]{
-
+ClassMethod NumpyExample() [langauge=python]
+{
 	import numpy as np
 	data = np.array([1, 2, 3, 4, 5])
 	mean_value = np.mean(data)

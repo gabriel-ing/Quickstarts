@@ -1,6 +1,6 @@
 # Getting Started with IRIS Community
 
-InterSystems IRIS is an advanced data platform, providing SQL and NoSQL database management, server-side application coding and data-analytics in one, trusted, enterprise-grade product. InterSystems IRIS for Health, builds on IRIS, with additional healthcare features, including tools for a FHIR server, and built in handling of many healthcare data standards. 
+InterSystems IRIS is an advanced data platform, providing SQL and NoSQL database management, server-side application coding and data-analytics in one, trusted, enterprise-grade product. InterSystems IRIS for Health uses InterSystems IRIS at the core, but includes additional healthcare features, including tools for a FHIR server, and built in handling of many healthcare data standards. 
 
 InterSystems IRIS Community and InterSystems IRIS-Health Community are free-to-use versions for experimentation, evaluation and non-commercial explorations of the platforms capabilities. There are certain resource and functionality limitations to prevent these editions being used in a production environment, for example the total data limit is 10 GB and the license key expires 1 year after release. However, these are a great resource to begin exploring how to use InterSystems IRIS.
 
@@ -58,6 +58,17 @@ docker run --name my-iris --publish 52773:52773 --publish 1972:1972 -d intersyst
 The usage is identical to what is covered above, but this edition contains healthcare specific libraries, including the ability to [set up a FHIR server](../FHIRServer/CreateAFHIRSeverIn5Minutes.md)
 
 And there you have it, a fully functional local version of InterSystems IRIS Community Edition to start exploring. To set-up your development environment see [Setting Up your development environment](../DevelopmentEnvironment/Development%20Environment%20Set-up.md).
+
+### Unexpire passwords
+
+By default, Community editions of IRIS health have the password SYS for every account, but these have expired, meaning you will be prompted to change the passwords on first login with the management portal. Authorization with other methods might fail due to an unexpired password. You can unexpire the passwords with the following command
+
+```
+set $NAMESPACE = "%SYS"
+do ##class(Security.Users).UnExpireUserPasswords("*")
+```
+
+**This is only suitable for development and should not be used in production.**
 
 ## Downloading an Install Kit
 
@@ -159,7 +170,7 @@ You may be able view the management portal using the DNS location listed, though
 
 `http://ec2-??-??-??-???.compute-1.amazonaws.com:52773/csp/sys/%25CSP.Portal.Home.zen`
 
-Where `?`is the server IP address.
+Where `?` values replace is the server IP address.
 
 #### Terminating Instance
 

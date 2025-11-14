@@ -8,13 +8,14 @@ There are many ways to create a REST API with IRIS, this guide shows a very simp
 
 In the simple example below, we are going to create a library service that receives information on a pet and saves it into the database. For this, we need also need a %persistent class to store in the database. This database storage could also be achieved with SQL queries.
 
-To create the simplest REST service therefore we simply need to: 
-	- Dispatch class to route the requests - `disp.cls`
-	- Implementation class to create the methods - `impl.cls`
-	- Persistent class to store data in database. - `person.cls` 
-	- Create a web-application
+To create the simplest REST service therefore we simply need: 
+
+- Dispatch class to route the requests - `disp.cls`
+- Implementation class to create the methods - `impl.cls`
+- Persistent class to store data in database. - `person.cls` 
+- To create a web-application
 	
-### Persistent class
+## Persistent class
 
 Our data is in the following format: 
 ```json
@@ -25,7 +26,8 @@ Our data is in the following format:
 }
 ```
 
-We can create the following Persistent class to represent this. 
+We can create the following Persistent class to represent this as a data table.
+
 ```
 Class petapi.Pet Extends (%Persistent, %JSON.Adapter)
 {
@@ -43,11 +45,11 @@ Class petapi.Pet Extends (%Persistent, %JSON.Adapter)
 	
 }
 ```
-The class inherits from %Persistent and %JSON.Adapter. 
+The class inherits from `%Persistent` and `%JSON.Adapter`. 
 
-%JSON.Adapter makes it easier to parse data into and from JSON. 
+`%JSON.Adapter` makes it easier to parse data into and from JSON. 
 
- %Persistent class defines an object that can be saved to the database which means an object can be created using:
+ `%Persistent` class defines an object that can be saved to the database which means an object can be created using:
 
 ```
 set dog = ##class(petapi.Pet).%New()
@@ -62,17 +64,19 @@ and saved to the database with:
 ```
 dog.%Save()
 ```
-### Dispatch class
+## Dispatch class
 
 Now lets create the dispatch class. For this guide, we are going to create two API routes: 
 - A POST Request to `/petapi/pet` to add an animal to the database
 - A GET Request to `/petapi/pet/<PetId>` to retrieve the info of a specific pet. 
 
-The dispatch class  inherits from %CSP.REST
+The dispatch class  inherits from `%CSP.REST`
 
-	Class petapi.disp Extends %CSP.REST{
+```
+Class petapi.disp Extends %CSP.REST{
+```
 
-The routes are defined in XML data in the dispatch class. Each route has an endpoint location (url), the HTTP method being used, and a function that is called. 
+The routes are defined in XML data in an XData block called `UrlMap` within the dispatch class. Each route has an endpoint location (url), the HTTP method being used, and a function that is called. 
 
 ```xml
 	XData UrlMap [ XMLNamespace = "https://www.intersystems.com/urlmap" ]
@@ -94,13 +98,13 @@ The ClassMethod for handling the GetPet method is shown below.
 	ClassMethod GetPet(pid As %Integer) As %Status
 		{
 		    Try {
-			  // Boilerplate code for handling content type (JSON)
-			  
+
+			    // Boilerplate code for ensuring the content recieved is valid JSON
 		        Do ##class(%REST.Impl).%SetContentType("application/json")
 		        If '##class(%REST.Impl).%CheckAccepts("application/json") Do ##class(%REST.Impl).%ReportRESTError(..#HTTP406NOTACCEPTABLE,$$$ERROR($$$RESTBadAccepts)) Quit
 	
 				// Call to implementation class
-		        Set response=##class(petapi.impl).GetPet(pid)
+		        Set response = ##class(petapi.impl).GetPet(pid)
 		        
 				// Write implementation class response as REST response
 		        Do ##class(%REST.Impl).%WriteResponse(response)
@@ -145,25 +149,28 @@ ClassMethod AddPet() As %Status
 }
 ```
 
-### Implementation Class
+## Implementation Class
 
 In the dispatch class above, we point to the class methods `AddPet()` and `GetPet()` from `petapi.impl`, e.g.:
 
-	Set response=##class(petapi.impl).GetPet(pid)
+```
+Set response = ##class(petapi.impl).GetPet(pid)
+```
 
 We now need to define these class methods in the implementation class:
 	
 
-	```
-	Class petapi.impl Extends %CSP.REST
-	{
-	ClassMethod AddPet(body As %DynamicObject) As %DynamicObject
-	{...}
-	ClassMethod GetPet(pid As %Integer) As %DynamicObject
-	{....}
-	```
+```
+Class petapi.impl Extends %CSP.REST
+{
+    ClassMethod AddPet(body As %DynamicObject) As %DynamicObject
+    {...}
+    ClassMethod GetPet(pid As %Integer) As %DynamicObject
+    {....}
+}
+```
 
-Here `%DynamicObject` is the output of the class, `%DynamicObject` is [essentially JSON format in ObjectScript]([Using JSON in ObjectScript | Using JSON | InterSystems IRIS Data Platform 2025.2](https://docs.intersystems.com/iris20252/csp/docbook/Doc.View.cls?KEY=GJSON_intro))
+Here `%DynamicObject` is the output of the class, `%DynamicObject` is [essentially JSON format in ObjectScript](https://docs.intersystems.com/iris20252/csp/docbook/Doc.View.cls?KEY=GJSON_intro).
 
 The `AddPet()` implementation method needs to:
 - Open a new pet object
@@ -229,7 +236,7 @@ ClassMethod GetPet(pid As %Integer) As %DynamicObject
 }
 ```
 
-### Creating Web Application
+### Creating the Web Application
 
 The last step required is to create a web application for our API. This process can be easily done in the management portal (System Administration -> Security -> Applications -> Web applications) or using the terminal: 
 
@@ -239,8 +246,6 @@ The last step required is to create a web application for our API. This process 
 Set $Namespace = "%SYS" 
 
 // Set Web application options in the array options
-// Optional Description
-Set options("Description") = "REST API for Pets" 
 
 / Web app is in USER namespace
 Set options("NameSpace") = "USER" 
@@ -251,7 +256,10 @@ Set options("DispatchClass") = "petapi.disp"
 // Set authorisation to all 
 Set options("MatchRoles") = ":%All" 
 
-// Create application passing in the web app location and props array
+// Optional Description
+Set options("Description") = "REST API for Pets" 
+
+// Create application passing in the web app location and options array
 Set sc = ##class(Security.Applications).Create("/petapi/", .options) 
 ```
 ### Sample Queries
@@ -290,8 +298,8 @@ Response Body:
 	"Type": "Cat" 
 	}
 ```
-### Full code
-#### Persistent Class 
+## Full code
+### Persistent Class 
 
 ```
 Class petapi.Pet Extends (%Persistent, %JSON.Adaptor)
@@ -306,7 +314,7 @@ Property Name As %String;
 Property Type As %String;
 }
 ```
-#### Dispatch Class
+### Dispatch Class
 
 ```
 Class petapi.disp Extends %CSP.REST
@@ -363,7 +371,7 @@ ClassMethod GetPet(pid As %Integer) As %Status
 ```
 
 
-#### Implementation Class
+### Implementation Class
 
 ```
 Class petapi.impl Extends %CSP.REST

@@ -6,7 +6,7 @@ This quickstart will go through how you can start using IRIS's Integrated Machin
 
 ## Download IRIS 
 
-If you haven't already, you can download IRIS-Community (or IRIS-Health-Community) from docker, or use an existing install. 
+If you haven't already, you can download InterSystems IRIS Community Edition (or InterSystems IRIS for Health Community Edition) from docker, or use an existing install. 
 ```bash
 docker run --name iris-community --publish 52773:52773 --publish 1972:1972 -d intersystems/iris-community:latest-em
 ```
@@ -24,8 +24,7 @@ and run the following command:
 python3 -m pip install --index-url https://registry.intersystems.com/pypi/simple --no-cache-dir --target /usr/irissys/mgr/python intersystems-iris-automl
 ```
 
-The install `--target` is the IRIS install location, and will vary by install method. The above is true for an IRIS Community image in a docker container, but may need to be altered for other install methods. 
-
+The install `--target` will vary by install method. The target given above is true for an InterSystems IRIS Community image in a docker container, but may need to be altered for other install methods. The general target is `/<IRIS-INSTALL-LOCATION>/mgr/ptyhon`. 
 
 # Predicting Survival on the Titanic
 
@@ -67,6 +66,7 @@ install dataset-titanic
 ```
 
 ## Test/Train Split
+
 **From this point the rest of the tutorial is performed in SQL, this can be run from the Management Portal SQL Editor at: http://localhost:52773/csp/sys/exp/%25CSP.UI.Portal.SQL.Home.zen?$NAMESPACE=USER** 
 
 **However, the SQL can also be performed from any other SQL client, including SQLTools, DBeaver, Python DB-API, ObjectScript etc.**

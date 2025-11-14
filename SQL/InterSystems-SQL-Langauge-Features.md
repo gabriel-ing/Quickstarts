@@ -1,14 +1,14 @@
 # InterSystems SQL Dialect
 
-Structured Query Language (SQL) can be used to query IRIS databases in a relational way, however like all data platforms, InterSystems SQL has many unique syntactic points and features, some of which will be covered here. This guide will serve as an introduction to InterSystem-specific SQL functions, so is aimed at developers who are familiar with standard SQL commands.
+Structured Query Language (SQL) can be used to query InterSystems IRIS databases in a relational way, however like all data platforms, InterSystems SQL has many unique syntactic points and features, some of which will be covered here. This guide will serve as an introduction to InterSystem-specific SQL functions, so is aimed at developers who are familiar with standard SQL commands.
 
-It's important to note that while data in IRIS can be accessed using SQL queries, the underlying data is stored in multi-dimensional hierarchical structures called Globals. As such, relational tables are one of many models the data can be accessed from.
+It's important to note that while data in InterSystems IRIS can be accessed using SQL queries, the underlying data is stored in multi-dimensional hierarchical structures called Globals. As such, relational tables are one of many models the data can be accessed from.
 
-Basic SQL syntax in IRIS conforms to the SQL-92 standard syntax and commands, meaning familiar commands can be used as expected, and migration to InterSystems is straightforward. 
+Basic SQL syntax in InterSystems IRIS conforms to the SQL-92 standard syntax and commands, meaning familiar commands can be used as expected, and migration to InterSystems is straightforward. 
 
 ## Standard SQL 
 
-IRIS and InterSystems support ANSI Standard SQL operators and syntax, so fundamentally, one can expect any existing knowledge of SQL to  remain the same. Operators such as `SELECT`, `INSERT`, `UPDATE`, `JOIN`s, `GROUP BY`, `ORDER BY`, `WHERE`, et cetera, all work as standard. If you know SQL, you will feel at home. 
+InterSystems support ANSI Standard SQL operators and syntax, so fundamentally, one can expect any existing knowledge of SQL to  remain the same. Operators such as `SELECT`, `INSERT`, `UPDATE`, `JOIN`s, `GROUP BY`, `ORDER BY`, `WHERE`, et cetera, all work as standard. If you know SQL, you will feel at home. 
 
 ## Key InterSystems SQL Differences 
 
@@ -79,9 +79,9 @@ Selects all entries with the digit 2 in the age:
 The `%MATCHES` operator is a simple pattern matching tool. Patterns can be created using:
 - `*` as a wildcard to match any number of characters (including zero)
 - `?` as a wildcard to match a single character
-- [abc] to match any one of the characters specified in brackets
-- [^abc] to match any character except those in brackets
-- [a-z], [0-9] to match a range of characters specified in brackets.
+- `[abc]` to match any one of the characters specified in brackets
+- `[^abc]` to match any character except those in brackets
+- `[a-z]`, `[0-9]` to match a range of characters specified in brackets.
 
 For example: 
 

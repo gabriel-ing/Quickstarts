@@ -2,7 +2,7 @@
 
 Vector search is fundamental to many modern AI and machine learning techniques. Unstrutured data can be embedded into a vector position on a multi-dimensional plane, with the resulting position representing their semantic meaning. Data with the similar semantic meaning have vectors which are close to each other. Vector searches therefore can be used to quickly retrieve related information based on semantic meaning. 
 
-IRIS has built in features for Vector search within the SQL dialect with the introduction of VECTOR and EMBEDDING data types.
+InterSystems IRIS has built in features for Vector search within the SQL dialect with the introduction of VECTOR and EMBEDDING data types.
 - VECTOR is for data already in vector format
 - EMBEDDING is used to convert an existing column to vectors, this requires configuration. 
 
@@ -29,7 +29,7 @@ INSERT INTO VectorStore (Sentence, SentenceVector) ("Hello World", TO_VECTOR("[1
 
 ### EMBEDDING 
 
-SQL Datatype for automatic embedding of another data column to vectors. Requires creating embedding configuration with %Embedding.Config (see below). Takes two arguments on column creation, - the name of the embedding configureation being used and the table column to be embedded.
+SQL Datatype for automatic embedding of another data column to vectors. Requires creating embedding configuration with %Embedding.Config (see below). Takes two arguments on column creation, - the name of the embedding configuration being used and the table column to be embedded.
 
 **Usage:** 
 ```sql
@@ -197,4 +197,4 @@ Output:
 ```
 (('A cup of coffee in the morning helps me focus better at work.',),)
 ```
-As one might expect, the sentence most similar to a query about Green tea is one about coffee. So there we have it, a simple vector search set-up, performed with InterSystems IRIS.
+As one might expect, the sentence most similar to a query about Green tea is one about coffee. So there we have it, a simple vector search set-up, performed with InterSystems IRIS!

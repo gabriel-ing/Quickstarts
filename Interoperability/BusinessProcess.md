@@ -1,10 +1,10 @@
 ## Business Processes
 
-Now we have the functions at either end of the production, the next to do is connect them using a conditional routing process. The rules behind the message routing are simple. When a message arrives, the `ToUpdateStock` operation needs to be called synchronously to recieve the output of the new stock number. If the resulting stock is low, in this example we shall put a limit of 5 units, the business process sends an additional call to `ToEmail`. 
+Now we have the Business operations to perform the functions required by our production. The next step is call them using a conditional routing process. 
 
-There are several ways to create a business process, including creating custom ObjectScript business processes extending the `Ens.BusinessProcess` superclass. However, the easiest way is to create a business process based on Business Process Language, BPL. 
+The rules behind the message routing are simple. When a message arrives, the `ToUpdateStock` operation needs to be called synchronously to recieve the output of the new stock number. If the resulting stock is low, in this example we shall put a limit of 5 units, the business process sends an additional call to `ToEmail`. 
 
-BPL uses XML format to create a simple hierarchical flow. 
+There are several ways to create a business process, including creating custom ObjectScript business processes extending the `Ens.BusinessProcess` superclass. Here however, we are going to use Business Process Language (BPL). BPL uses XML format to create a simple hierarchical flow. 
 
 The easiest way to create a business process is by using the Business Process Designer UI, which result of this is to create a new class which extends `Ens.BusinessProcessBPL`. This class contains the process within XML (XData). 
 
@@ -16,11 +16,11 @@ To access the Business Process Designer UI, navigate from the management portal 
 
 `Interoperability -> Build -> Business Processes -> Go`
 
-The remainder of this guide will focus on the logic behind the process and the configuration required to perform the desired message routing, however will not focus on where to access these settings using the UI. 
+The remainder of this guide will focus on the logic behind the process and the configuration required to perform the desired message routing, working directly in XML code. We will not focus on where to access settings using the UI, but the same logic and settings can be applied to automatically create the BPL class (and XML code it contains) within the BPL designer.
 
 **If you do chose to use the Business Process Designer, please note that in order to use the created process as a standalone component, you have to tick the `Is Component` checkbox in the general process settings.**
 
-### Descision Logic
+### Logical flow
 
 The required Business Process flow is very simple:
 
@@ -40,7 +40,8 @@ Class sample.interop.ProcessTransactionRouterRules Extends Ens.BusinessProcessBP
 {...}
 ```
 
-The Business Process logic is stored inside this class as XML data (XData):
+The Business Process logic is stored inside this class as XML data (XData). The XData name needs to be BPL and it should have the XML namespace defined. 
+
 ```
 XData BPL [ XMLNamespace = "http://www.intersystems.com/bpl" ]
 { <...>}
@@ -165,7 +166,13 @@ The call request message needs to be populated with the
 
 ## Next Steps
 
-There we have it! Our Business process should now be fully functioning. The full code can be seen below. Now we can move onto the final step of the build, creating the first step of the production [the Business Service Class](BusinessService.md)
+There we have it! Our Business process should now be fully functioning. 
+
+We can add the process to the production in the same way as we added the operation, by clicking the `+` next to `Processes` in the Production Configuration UI, and selecting our class. We can also test it using the same method described in the Operations guide. 
+
+The full code can be seen below.
+
+ Now we can move onto the final step of the build, creating the first step of the production [the Business Service Class](BusinessService.md)
 
 ## Complete Class
 

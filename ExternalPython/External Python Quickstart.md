@@ -1,11 +1,16 @@
-## Connecting to IRIS from External Python programs 
+# Connecting to InterSystems IRIS from External Python programs 
+
+Much of the functionality of InterSystems IRIS can be accessed from Python programs which run externally to the InterSystems IRIS instance. This is distinct from Embedded Python, which exists  inside InterSystems IRIS classes and is run by the same server as the ObjectScript code and databases. 
+
+This guide refers to connecting to instances of InterSystems IRIS using applications run on other servers or computers. This connection can be made to allow access to InterSystems IRIS databases, or to run scripts or functions on the InterSystems IRIS server. 
+
+## Installing the Python Software Development Kit
 
 The SDK can be installed using pip: 
 
 ```
 pip install intersystems-irispython
 ```
-
 
 You can then connect to IRIS as follows: 
 
@@ -23,7 +28,7 @@ connection = iris.connect(server, port, namespace, username, password)
 
 From the connection object, you can either create a irispy object to access globals and server-side methods, or create a cursor object to run SQL queries on a database. 
 
-### Running SQL queries
+## Running SQL queries
 
 SQL queries on the database can be run with the Python DB-API or with SQL alchemy.
 
@@ -79,7 +84,7 @@ params = [
 ]
 cursor.executemany(sql, params)
 ```
-#### SQL alchemy
+### SQL alchemy
 
 SQLAlchemy is a Python SQL client which is supported by InterSystems. It can be installed with 
 
@@ -155,9 +160,9 @@ with engine.connect() as conn:
     conn.commit()
 ```
 
-#### Native connection (globals and methods)
+## Native connection (globals and methods)
 
-Access globals with an `iris.createIRIS connection:
+Globals and InterSystems IRIS classes can be accessed using an `iris.createIRIS` connection:
 
 ``` python
 ## Create connection (as above)

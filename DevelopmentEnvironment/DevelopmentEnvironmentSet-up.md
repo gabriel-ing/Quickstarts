@@ -1,3 +1,5 @@
+# Setting Up Your Development Environment In VS Code
+
 This page is a brief reference guide to getting started using the recommended ObjectScript development environment, VS Code. The guide is not comprehensive, but should have enough information to get started. For comprehensive information, see "Further Resources".
 
 
@@ -8,7 +10,9 @@ There are three officially supported VS Code extensions to improve the developme
 - InterSystems Server Manager
 - InterSystems ObjectScript Extension
 
-These can be downloaded together as the [InterSystems ObjectScript Extension Pack](https://marketplace.visualstudio.com/items?itemName=intersystems-community.objectscript-pack). After installing, the InterSystems logo should appear on the navigation panel on the left hand side:
+These can be installed together as the [InterSystems ObjectScript Extension Pack](https://marketplace.visualstudio.com/items?itemName=intersystems-community.objectscript-pack). 
+
+After installing, the InterSystems logo should appear on the navigation panel on the left hand side:
 
 ![vs-code-logo-panel](images/vs-code-logo-panel.png)
 
