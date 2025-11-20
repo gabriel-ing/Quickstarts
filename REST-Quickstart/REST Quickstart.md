@@ -2,17 +2,19 @@
 
 There are many ways to create a REST API with IRIS, this guide shows a very simple code-first example as a place to get started. 
 
- REST APIs tend to use two IRIS classes, a Dispatch class, and an implementation class. The Dispatch class defines the endpoints, routes and which methods are called in response to an HTTP request. The Implementation class defines the methods that are called.
+This guide is going to show the entire process to completely demonstrate how a REST service functions. It is worth noting that there are shortcuts available to easily create boilerplate code and stub-functions, for example using an OpenAPI specification.  
+
+REST APIs use two classes, a Dispatch class, and an implementation class. The Dispatch class defines the endpoints, routes and which methods are called in response to an HTTP request. The Implementation class defines the methods that are called.
 
 	GET Request ---> <server>/api/endpoint ---> Dispatch class ---> Implementation class
 
-In the simple example below, we are going to create a library service that receives information on a pet and saves it into the database. For this, we need also need a %persistent class to store in the database. This database storage could also be achieved with SQL queries.
+In the simple example below, we are going to create a service that receives information on a pet and saves it into the database. For this, we need also need a %persistent class to store in the database. This database storage could also be achieved with SQL queries.
 
 To create the simplest REST service therefore we simply need: 
 
-- Dispatch class to route the requests - `disp.cls`
-- Implementation class to create the methods - `impl.cls`
-- Persistent class to store data in database. - `person.cls` 
+- A Dispatch class to route the requests - `disp.cls`
+- A Implementation class to create the methods - `impl.cls`
+- A Persistent class to store data in database. - `person.cls` 
 - To create a web-application
 	
 ## Persistent class
@@ -29,7 +31,7 @@ Our data is in the following format:
 We can create the following Persistent class to represent this as a data table.
 
 ```
-Class petapi.Pet Extends (%Persistent, %JSON.Adapter)
+Class petapi.Pet Extends (%Persistent, %JSON.Adaptor)
 {
 	// ID value 
 	Property PetId As %Integer; 
@@ -45,9 +47,9 @@ Class petapi.Pet Extends (%Persistent, %JSON.Adapter)
 	
 }
 ```
-The class inherits from `%Persistent` and `%JSON.Adapter`. 
+The class inherits from `%Persistent` and `%JSON.Adaptor`. 
 
-`%JSON.Adapter` makes it easier to parse data into and from JSON. 
+`%JSON.Adaptor` makes it easier to parse data into and from JSON. 
 
  `%Persistent` class defines an object that can be saved to the database which means an object can be created using:
 
@@ -66,14 +68,14 @@ dog.%Save()
 ```
 ## Dispatch class
 
-Now lets create the dispatch class. For this guide, we are going to create two API routes: 
+Now let's create the dispatch class. For this guide, we are going to create two API routes: 
 - A POST Request to `/petapi/pet` to add an animal to the database
 - A GET Request to `/petapi/pet/<PetId>` to retrieve the info of a specific pet. 
 
 The dispatch class  inherits from `%CSP.REST`
 
 ```
-Class petapi.disp Extends %CSP.REST{
+Class petapi.disp Extends %CSP.REST{...}
 ```
 
 The routes are defined in XML data in an XData block called `UrlMap` within the dispatch class. Each route has an endpoint location (url), the HTTP method being used, and a function that is called. 
@@ -170,7 +172,7 @@ Class petapi.impl Extends %CSP.REST
 }
 ```
 
-Here `%DynamicObject` is the output of the class, `%DynamicObject` is [essentially JSON format in ObjectScript](https://docs.intersystems.com/iris20252/csp/docbook/Doc.View.cls?KEY=GJSON_intro).
+Here is the output of the class is a `%DynamicObject`. `%DynamicObject` is [essentially JSON format in ObjectScript](https://docs.intersystems.com/iris20252/csp/docbook/Doc.View.cls?KEY=GJSON_intro).
 
 The `AddPet()` implementation method needs to:
 - Open a new pet object
@@ -247,7 +249,7 @@ Set $Namespace = "%SYS"
 
 // Set Web application options in the array options
 
-/ Web app is in USER namespace
+// Web app is in USER namespace
 Set options("NameSpace") = "USER" 
 
 // Dispatch class 
@@ -370,7 +372,6 @@ ClassMethod GetPet(pid As %Integer) As %Status
 }
 ```
 
-
 ### Implementation Class
 
 ```
@@ -425,9 +426,6 @@ ClassMethod GetPet(pid As %Integer) As %DynamicObject
 }
 }
 ```
-
-
-
 
 ### Read More
 
