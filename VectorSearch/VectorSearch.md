@@ -6,107 +6,23 @@ InterSystems IRIS has built in features for Vector search within the SQL dialect
 - VECTOR is for data already in vector format
 - EMBEDDING is used to convert an existing column to vectors, this requires configuration. 
 
+This guide will focus on the use of the VECTOR data type, and the insertion of already generated vectors.
+
 For complete documentation, see: [Vector Search Documentation](https://docs.intersystems.com/irislatest/csp/docbook/Doc.View.cls?KEY=GSQL_vecsearch#GSQL_vecsearch_index).
 
-## IRIS Vector Search keywords
+## Vector Search Steps
 
-### VECTOR
-SQL datatype. It is defined with a type for each dimension, usually a numeric type like DOUBLE, and a number of dimensions. The number of dimensions will depend on the embedding model used. 
+The steps to performing a vector search in InterSystems IRIS are: 
+1. Create Vectors with an Embedding model
+2. Insert Vectors into a table with the VECTOR datatype 
+3. Convert query prompt to a vector 
+4. Query the database using VECTOR_COSINE() or VECTOR_DOT_PRODUCT() to order the data
 
-Usage: 
-```sql
-CREATE TABLE VectorStore ( Sentence VARCHAR(200), SentenceVector VECTOR(DOUBLE, 384))
-```
+## Walkthrough
 
-### TO_VECTOR() 
+As Python is the primary language used for Embedding Models, Transformers and AI generally, this example is written in client-side Python code, connecting to InterSystems IRIS with the Python DB-API. However, the process would be similar and involve the same SQL commands for other coding languages or server-side embedded Python. 
 
-SQL Function to convert a vector represented as a string (e.g. "[1, 2, 3]") to a SQL VECTOR datatype.
-
-Usage: 
-```sql
-INSERT INTO VectorStore (Sentence, SentenceVector) ("Hello World", TO_VECTOR("[1,2,3]"))
-```
-
-### EMBEDDING 
-
-SQL Datatype for automatic embedding of another data column to vectors. Requires creating embedding configuration with %Embedding.Config (see below). Takes two arguments on column creation, - the name of the embedding configuration being used and the table column to be embedded.
-
-**Usage:** 
-```sql
-CREATE TABLE EmbeddingStore (Sentence VARCHAR(200), SentenceEmbedding EMBEDDING("my-embedding-config", "Sentence"))
-```
-
-### VECTOR_DOT_PRODUCT()
-
-Function to calculate the distance between vectors, measuring both magnitude and direction of the vector. Commonly used to order results to find the most similra 
-
-**Usage:** 
-VECTOR Type: 
-```sql
-SELECT TOP 5 Sentence FROM VectorStore
-  ORDER BY VECTOR_DOT_PRODUCT(SentenceVector, 
-                              TO_VECTOR("[0.1 ... 0.3]")) DESC
-```
-
-Embedding Type: 
-```sql
-SELECT TOP 5 Sentence FROM EmbeddingStore
-  ORDER BY VECTOR_DOT_PRODUCT(SentenceEmbedding, 
-                              EMBEDDING(?)) DESC
-```
-### VECTOR_COSINE()
-Function to calculate the angle between vectors. This ignores the magnitude of the vector, which may be important if the vectors are not normalised or if you have very variable sentence lengths.  
-
-**Usage:**
-
-VECTOR Type: 
-```sql
-SELECT TOP 5 Sentence FROM VectorStore
-  ORDER BY VECTOR_COSINE(SentenceVector, 
-                              TO_VECTOR("[0.1 ... 0.3]")) DESC
-```
-Embedding Type: 
-```sql
-SELECT TOP 5 Sentence FROM EmbeddingStore
-  ORDER BY VECTOR_COSINE(SentenceEmbedding, 
-                        EMBEDDING("Birds Fly High")) DESC
-```
-#### %EmbeddingConfig
-
-Table containing the embedding configurations for use with Embedded datatype. To create a new config, insert a row with:  
-- *config name*
-- *Configuration* (JSON Formatted string), 
-- *Embedding class*  
-- *Vector Length*
-- *Description*
-
-For full details, see the [documentation](https://docs.intersystems.com/iris20252/csp/docbook/Doc.View.cls?KEY=GSQL_vecsearch#GSQL_vecsearch_insembed).
-
-**Usage:** 
-```sql
-INSERT INTO %Embedding.Config (Name, Configuration, EmbeddingClass, VectorLength, Description)
-  VALUES ('my-openai-config', 
-          '{"apiKey":"<api key>", 
-            "sslConfig": "llm_ssl", 
-            "modelName": "text-embedding-3-small"}',
-          '%Embedding.OpenAI', 
-          1536,  
-          'a small embedding model provided by OpenAI') 
-```
-
-### INDEX
-
-A column type used (in this context) to improve vector search efficiency by pre-calculating distances in VECTOR or EMBEDDING columns. Algorithms used include Approximate Nearest Neighbour (ANN) and Heirarchical Navigable Small World (HNSW).
-
-**Usage:**
-```sql
-CREATE INDEX HNSWIndex ON TABLE VectorStore (SentenceVector)
-  AS HNSW(Distance='Cosine')
-```
-
-
-## Complete Example
-This quickstart will cover using the VECTOR datatype from external Python application connected via the DB-API.. Vector embeddings are created with the [sentence transformers library](https://www.sbert.net/). 
+Vector embeddings are created with the [sentence transformers library](https://www.sbert.net/). 
 
 #### Install dependancies: 
 
@@ -138,7 +54,7 @@ cursor = connection.cursor()
 Here were are defining a new table containing a sentence, and the corresponding Vectors. We define the VECTOR data type, with each vector having 384 dimensions made up of the DOUBLE floating point number data type.
 
 ```python
-create_table_query= """ CREATE TABLE VectorStore (
+create_table_query= """ CREATE TABLE Sample.VectorStore (
     Sentence VARCHAR(200), 
     SentenceVector VECTOR(DOUBLE, 384)
 )
@@ -161,17 +77,20 @@ sentences = [
 # Load a pre-trained sentence transformer model. 
 model = SentenceTransformer('all-MiniLM-L6-v2') 
 
-# Generate embeddings for all descriptions at once. 
-embeddings = model.encode(sentences, normalize_embeddings=True)
+# Generate embeddings for all descriptions at once and return them as a list
+embeddings = model.encode(sentences, normalize_embeddings=True).tolist()
 
-embeddings_string_list = [str(x) for x in embeddings.tolist()]
 ```
 
 #### Add vectors to IRIS table
 
 ```python
-sql_insert = "INSERT INTO VectorStore (Sentence, SentenceVector), (? TO_VECTOR(?))"
-cursor.executemany(sql_insert, embedding_string_list)
+# Create the SQL Insert Command using ? as placeholders fov values
+sql_insert = "INSERT INTO Sample.VectorStore (Sentence, SentenceVector) VALUES (?, TO_VECTOR(?))"
+
+# Insert each sentence and corresponding vector
+for x in range(len(sentences)):
+    cursor.execute(sql_insert, [sentences[x], str(embeddings[x])])
 ```
 
 #### Perform search
@@ -185,7 +104,7 @@ query_vector = model.encode(query, normalize_embeddings=True).tolist()
 
 # Create query
 query_sql = """SELECT TOP 1 Sentence 
-                FROM VectorStore
+                FROM Sample.VectorStore
                 ORDER BY VECTOR_DOT_PRODUCT(SentenceVector, TO_VECTOR(?, DOUBLE)) DESC"""
 
 # Execute sql passing in the query vector as a string
@@ -198,3 +117,33 @@ Output:
 (('A cup of coffee in the morning helps me focus better at work.',),)
 ```
 As one might expect, the sentence most similar to a query about Green tea is one about coffee. So there we have it, a simple vector search set-up, performed with InterSystems IRIS!
+
+
+## Indexing 
+The efficiency of InterSystems IRIS Vector Search is improved by an Approximate Nearest Neighbor index, meaning not every vector calculation needs to be performed, and instead an approximation limits the search to only the vectors close to the query vector. While this means the results are not guarenteed to be completely accurate, it can provide a huge performance benefit for large datasets. 
+
+Indexes are created automatically upon insertion. For large datasets, this can dramatically slow down the rate of insertion, so it can be beneficial to turn off the automated indexing, and instead manually create an index after insertion. 
+
+To separate insertion and indexing, use the %NOINDEX keyword when inserting (or updating a row): 
+
+```
+INSERT %NOINDEX INTO Sample.VectorStore (Sentence, SentenceVector) VALUES ("The quick brown fox", TO_VECTOR("[0.2, 0.1, ....]"))
+```
+or
+```
+UPDATE %NOINDEX Sample.VectorStore SET SentenceVector = TO_VECTOR("[0.2, 0.1, ....]") WHERE ID = rowID
+```
+
+After insertion, the index can be created using: 
+
+```
+CREATE INDEX HNSWIndex ON TABLE Sample.VectorStore (SentenceVector) AS HNSW(Distance="Cosine")
+``` 
+
+With small datasets, it is likely faster to insert with automatic indexing, and it is possible that the automatic SQL optimiser in InterSystems IRIS will result in the index not being used. 
+
+## Cosine Vs Dot Prodct
+
+When comparing the similarity of Vectors, there is a choice between using VECTOR_COSINE() and VECTOR_DOT_PRODUCT(). The practical difference between these is that VECTOR_COSINE measures the angle between the vectors only, while the dot product combines both direction and magnitude of the vectors. As such, the dot product will also be sensitive to the size of the vector. Dot product therefore could be useful to perform the calculation weighted by strength. 
+
+In many cases (including the example above), the vectors are normalised, meaning the vector magnitude is constant. In these cases, both functions are likely to yield similar results, with the cosine being sufficient for most uses.  

@@ -32,8 +32,8 @@ Below is the suggested list of quickstarts still to be written:
 
 By me: 
 - node.js
-- Web development / csp? 
-
+- ~~Web development / csp?~~
+    - My understanding of the current state of web development with IRIS is that it is no longer encouraged - ZEN is deprecated and CSP is no longer encouraged. The currently encouraged method is to use a front end framework (Angular). 
 
 By Others:
 - Java
@@ -41,6 +41,3 @@ By Others:
 - Analytics
 
 
-As an aside, this is a nice feature of the vector search documentation page: 
-
-![](DocsExample.png)
