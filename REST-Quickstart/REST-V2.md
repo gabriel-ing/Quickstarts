@@ -122,12 +122,21 @@ This process creates a new web application at `<serverlocation>:<port>/csp/TaskM
 This specifies that if we send a GET request to `<serverlocation>:<port>/csp/TaskManager/tasks`, we call the operation `getTasks` (implemented below).
 
 
-Using the ^%REST routine creates an Implementation Class (`impl.cls`) and a specification class (`spec.cls`). The specification class contains the OpenAPI specification in an XData block within the class. Any changes to the desired REST design should be done by editing the specification here, with the changes automatically propagating to the implementation class.
+Using the ^%REST routine creates an Implementation Class (`impl.cls`) and a specification class (`spec.cls`). The specification class contains the OpenAPI specification in an XData block within the class. 
 
+**Any changes to the desired REST design should be done by editing the specification in the `spec.cls` file with the changes automatically propagating to the implementation class.**
+
+## Setting Web-Application Settings
+
+To view and edit the settings of a Web-Application go to `System Administration -> Security -> Applications -> Web Applications` and select the application name (`/csp/TaskManager`) from the list.
+
+For development, you may wish to bipass Authentication, in which case tick the `Unauthenticated` checkbox next to `Allowed Authenticated Methods`. 
+
+You may also wish to define what access a User of your web-application automatically has. If so,  switch to the `Application Roles`, select the desired application roles from the Availble list, and then click Assign. For local development, you may wish to allow `%All` access, but for production you will need to be more careful about access and roles. 
 
 ## Implementation class
 
-The implementation class (`Impl.cls`) will be generated with stub methods for the operations detailed in the OpenAPI specification. This will be in the package name given as the name for the new application (`TaskManager`) in this example. 
+The implementation class (`impl.cls`) will be generated with stub methods for the operations detailed in the OpenAPI specification. This will be in the package name given as the name for the new application (`TaskManager`) in this example. 
 
 
 ClassMethod getTasks() As %DynamicObject
@@ -271,11 +280,20 @@ write name
     FROM TaskManager.tasks)
 
 ```
+As some datatypes (particularly Date and Time) are saved in a particular formats in the database, it can be important to set the output format. For Embedded SQL (anything with `&sql()`), this can be set by adding the following: 
 
-And in full: 
+```
+#sqlcompile select=ODBC
+```
+This returns Open DataBase Connectivity (ODBC) format, which is a database standard, so is recommended. 
+
+
+Therefore, we get the following function: 
 ```
 ClassMethod getTasks() As %DynamicObject
 {
+    #sqlcompile select=ODBC
+
     &sql(SELECT JSON_ARRAYAGG(
         JSON_OBJECT('ID':ID,'Title':Title,'Description':Description,
         'DueDate':DueDate,'DateLastModified':DateLastModified,'Status':Status)) 
@@ -289,7 +307,6 @@ ClassMethod getTasks() As %DynamicObject
 We can test this with the following get request:
 ```http
 GET http://localhost:52773/csp/TaskManager/tasks
-Authorization: Basic SuperUser SYS
 ```
 
 ### PUT request
@@ -303,7 +320,6 @@ The PUT request updates a task. The main forseeable use for this is to update th
 Test with a PUT request as follows:
 ```http
 PUT http://localhost:52773/csp/TaskManager/tasks/1
-Authorization: Basic SuperUser SYS
 Content-Type: application/json
 Accept: application/json
 
@@ -312,6 +328,14 @@ Accept: application/json
     }
 
 ```
+
+### Delete Request
+```http
+DELETE http://localhost:52773/csp/TaskManager/tasks/7
+Accept: application/json
+```
+
+
 
 ## Requesting and Debugging
 
@@ -328,3 +352,69 @@ set ^test(1) = "Done JSON Export"
 ```
 
 For more sophisticated debugging, there is a [debugging tool](https://docs.intersystems.com/components/csp/docbook/DocBook.UI.Page.cls?KEY=GVSCO_debug#GVSCO_debug_rest) included in the [VS Code ObjectScript Extensions pack](https://marketplace.visualstudio.com/items?itemName=intersystems-community.objectscript-pack) which includes functionality to debug REST APIs.
+
+## Working with CORS
+
+Cross-Origin Resource Sharing (CORS) is a security mechanism that controls how web applications running in one domain can access resources for another domain. It is an important security measure and should be handled with care for production purposes. 
+
+During development however, CORS measures can prevent an API running locally (Localhost) from being called from a web-browser. It can be notoriously difficult to enable CORS, so here are some things that can be tried if your requests are getting blocked by CORS. 
+
+#### 1. Add `HandleCorsRequest` Parameter
+
+In the specification class (`spec.cls`), add:
+
+```
+Parameter HandleCorsRequest = 1;
+```
+
+#### 2. Add specific CORS dispatch class
+
+Create a new class with the following: 
+
+```
+Class TaskManager.cors Extends %CSP.REST
+{
+
+ClassMethod OnHandleCorsRequest(url As %String) As %Status
+{
+    do %response.SetHeader("Access-Control-Allow-Origin","*")
+    do %response.SetHeader("Allow-Access-Control-Credentials",1)
+	do %response.SetHeader("Access-Control-Allow-Headers", "X-Requested-With")
+	do %response.SetHeader("X-Requested-With", "XMLHttpRequestXMLHttpRequest")
+	do %response.SetHeader("Access-Control-Allow-Headers","Content-Type, Authorization, Accept-Language, X-Requested-With, session")
+    do %response.SetHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+    q $$$OK
+}
+
+}
+```
+
+This will set a header to each request, which can allow various settings to be configured. 
+
+
+To call the CORS dispatch class, we need to add the following line to our OpenAPI specification in `spec.cls`: 
+
+```
+"x-ISC_DispatchParent":"TaskManager.cors",
+```
+This refers to the `TaskManager/cors.cls` class defined above, so change the name as appropriate. This line is shown in the context of the OpenAPI specification below: 
+
+```
+XData OpenAPI [ MimeType = application/json ]
+{
+{
+  "swagger":"2.0",
+  "info":{
+    "title":"Task Management API",
+    "version":"1.0.0",
+    "x-ISC_DispatchParent":"TaskManager.cors",
+    "description":"API for managing tasks (create, update, retrieve)"
+  }, ...
+  
+```
+
+#### 3. Configure CSPSystem User settings
+
+REST requests are by default performed in InterSystems IRIS by the user `CSPSystem`, unless other credentials are provided. Therefore, if one is accessing the REST API without authentication, it is important to make sure the `CSPSystem` user has suitable access to the SQL tables, and to Assign it relevant roles. 
+
+To edit the account access go to `System -> Security -> Users`. 
