@@ -1,4 +1,4 @@
-# Connecting to InterSystems IRIS from External Python programs 
+# Connecting to InterSystems IRIS from Python Applications 
 
 Much of the functionality of InterSystems IRIS can be accessed from Python programs which run externally to the InterSystems IRIS instance. This is distinct from Embedded Python, which exists  inside InterSystems IRIS classes and is run by the same server as the ObjectScript code and databases. 
 

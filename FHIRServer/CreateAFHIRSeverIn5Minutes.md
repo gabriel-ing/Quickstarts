@@ -29,8 +29,7 @@ Start an IRIS terminal - if you are using docker as suggested above, you can run
 docker exec -it iris-health-community iris session iris
 ``` 
 
-#### Create a new namespace for your FHIR server
-
+### Create a new namespace for your FHIR server
 
 ```
 set $NAMESPACE = "HSLIB"
@@ -38,7 +37,7 @@ do:'##class(%SYS.Namespace).Exists("fhirdemo") ##class(HS.Util.Installer.Foundat
 set $NAMESPACE = "fhirdemo"
 ```
 
-#### Install the FHIR server
+### Install the FHIR server Programatically
 
 ```
 // Make the path prefix for the FHIR server
@@ -135,36 +134,3 @@ print(res)
 print(res.json())
 ```
 
-## Configuring CORS
-
-Cross-Origin Resource Sharing (CORS) is a security feature in modern web browsers. While a complete discussion of CORS is beyond the scope of this guide, the ObjectScript commands below sets the CORS configuration to allow all domains, HTTP methods, common headers and credentials. This set-up may be helpful in development environments, particularly for web development, but should be more carefully considered for production environments. 
-
-```
-// Switch to the "fhirdemo" namespace where the FHIR server is running
-set $NAMESPACE = "fhirdemo"
-
-// Define the CORS configuration name
-set configName = "%CSP.CORS"
-
-// Open the existing CORS configuration or create a new one
-set corsConfig = ##class(Security.CSPConfig).%OpenId(configName)
-if corsConfig = "" {
-    set corsConfig = ##class(Security.CSPConfig).%New()
-    set corsConfig.Name = configName
-}
-
-// Allow all domains (for development purposes)
-set corsConfig.AllowOrigin = "*"
-
-// Allow common HTTP methods
-set corsConfig.AllowMethods = "GET,POST,PUT,DELETE,OPTIONS"
-
-// Allow common headers needed for FHIR API interactions
-set corsConfig.AllowHeaders = "Content-Type, Authorization, X-Requested-With"
-
-// Allow credentials (e.g., for authentication)
-set corsConfig.AllowCredentials = 1
-
-// Save the configuration
-do corsConfig.%Save()
-```
