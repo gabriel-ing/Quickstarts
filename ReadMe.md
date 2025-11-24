@@ -3,10 +3,10 @@
 Currently have first drafts of:
 
 - [Running IRIS community on docker / on the cloud](GettingStartedWithIRISCommunity/GettingStartedWithIRISCommunity.md).
-- [Setting Up Development environment (VS Code)](DevelopmentEnvironment/Development%20Environment%20Set-up.md)
-- [Server-side coding (ObjectScript/Classes/Embedded Python)](ServerSideCoding/Getting%20started%20with%20server-side%20coding.md)
-- [External Python](ExternalPython/External%20Python%20Quickstart.md)
-- [REST](REST-Quickstart/REST%20Quickstart.md)
+- [Setting Up Development environment (VS Code)](DevelopmentEnvironment/DevelopmentEnvironmentSet-up.md)
+- [Server-side coding (ObjectScript/Classes/Embedded Python)](ServerSideCoding/GettingStartedWithServer-sideCoding.md)
+- [External Python](ExternalPython/ExternalPythonQuickstart.md)
+- [REST](REST-Quickstart/REST-V2.md)
 
 - [Vector Search](VectorSearch/VectorSearch.md)
 - [Creating a FHIR Server ](FHIRServer/CreateAFHIRSeverIn5Minutes.md) 
@@ -18,13 +18,13 @@ Currently have first drafts of:
 - **Interoperability**
     - Having created the simplest example I could think of, I've concluded that a "quickstart" guide might not be so quick.
     - I've split this into 6 guides which are designed to work through the entire process start to finish. I wanted to make it shorter but I think it already has close to the bare minimum information required. I've split it into 
-        - [Interoperability introduction](Interoperability/interoperability.md)
-        - [Message](Interoperability/Messages.md)
-        - [Business Operations](Interoperability/BusinessOperations.md)
-        - [Business Process](Interoperability/BusinessProcess.md)
-        - [Business Service](Interoperability/BusinessService.md)        
-        - [Using the Production](Interoperability/UsingTheProduction.md) 
-    - I picture these being a sequence of pages
+        - [Interoperability introduction](Interoperability/1-interoperability.md)
+        - [Message](Interoperability/2-Messages.md)
+        - [Business Operations](Interoperability/3-BusinessOperations.md)
+        - [Business Process](Interoperability/4-BusinessProcess.md)
+        - [Business Service](Interoperability/5-BusinessService.md)        
+        - [Using the Production](Interoperability/6-UsingTheProduction.md) 
+    - I picture these being a sequence of pages or tabs on the same page.
 
 
 

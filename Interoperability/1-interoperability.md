@@ -255,16 +255,12 @@ XData ProductionDefinition
 </Production>
 }
 }
-
 ```
 
+## Next Steps 
 
+Having created the production, we can now start creating the components of the production. [Messages](2-Messages.md) are a good place to start because these define the information sent and recieved by every other component. 
 
-
-
-
-
-
-
+[Continue the tutorial](2-Messages.md) 
 
 
