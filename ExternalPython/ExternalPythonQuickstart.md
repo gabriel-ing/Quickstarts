@@ -191,7 +191,7 @@ You can also this `irispy` object to used with server-side classes and methods. 
 So we could use the following IRIS class:
 
 ```
-Class packageName.DemoClass 
+Class sample.DemoClass 
 {
 ClassMethod AddNumbers(a As %Integer, b As %Integer) As %Integer
 {
@@ -210,22 +210,22 @@ With:
 # See above for connection
 irispy = iris.createIRIS(connection)
 
-number_sum = irispy.classMethodValue("packageName.DemoClass", "AddNumbers", 1, 2) 
+number_sum = irispy.classMethodValue("sample.DemoClass", "AddNumbers", 1, 2) 
 print(number_sum) # prints 3
 
 # Sets the first integer subscript of a global to "Hello World"
-irispy.classMethodVoid("IncrementGlobal", "Hello World")
+irispy.classMethodVoid("sample.DemoClass", "IncrementGlobal", "Hello World")
 
-print(irispy.get("demoGlobal")) # prints 1 (or the number of times IncrementGlobal has been run)
+print(irispy.get("DemoGlobal")) # prints 1 (or the number of times IncrementGlobal has been run)
 
-print(irispy.get("demoGlobal", 1)) # Prints "Hello World"
+print(irispy.get("DemoGlobal", 1)) # Prints "Hello World"
 
 ```
 
 You can also create a class object, for example, say you had the IRIS class: 
 
 ```
-Class packagename.Person Extends %Persistent
+Class sample.Person Extends %Persistent
 {
 
 	Property Name As %String;
@@ -234,7 +234,7 @@ Class packagename.Person Extends %Persistent
 	
 	Method setName(name As %String) As %Status{
 		set ..Name = name
-		return
+		quit $$$OK
 	}
 	
 	Method addYears(num as %Integer) As %Integer {
@@ -247,7 +247,7 @@ You could use this in an external Python application with:
 
 ```python
 # Create new class obeject 
-person = irispy.classMethodObject("packagename.Person", "%New")
+person = irispy.classMethodObject("sample.Person", "%New")
 
 # Set a property
 person.set("Age", 25)

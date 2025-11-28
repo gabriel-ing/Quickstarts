@@ -4,7 +4,7 @@ There are many ways to create a REST API with IRIS, this guide shows how to crea
 
 A specification first approach means that the base classes for the REST process are automatically generated using an OpenAPI specification (OpenAPI is also known as Swagger).
 
-In this example, we are going to create a REST API for a basic task management system. 
+In this example, we are going to create a REST API for a basic task management system, allowing Create, Retrieve, Update and Delete (CRUD) operations to the InterSystems IRIS database. 
 
 
  ## Persistent class
@@ -55,6 +55,11 @@ Creating a full OpenAPI specification is beyond the scope of this guide, but bel
  - The specification needs to be OpenAPI 2.0 specification in JSON format.
  - Generative AI can create first drafts of simple specifications.
 
+To use a spec-first approach, you need the specification to be on the server. If you are running in a docker container, this can be easily achieved using a docker copy: 
+
+```
+docker cp task-manager-swagger-spec.json myiris:/home/irisowner/
+```
 
  ## Creating the REST Classes
 

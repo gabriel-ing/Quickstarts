@@ -28,12 +28,9 @@ Currently have first drafts of:
 
 
 
-Below is the suggested list of quickstarts still to be written: 
-
-By me: 
+WIP: 
 - node.js
-- ~~Web development / csp?~~
-    - My understanding of the current state of web development with IRIS is that it is no longer encouraged - ZEN is deprecated and CSP is no longer encouraged. The currently encouraged method is to use a front end framework (Angular). 
+
 
 By Others:
 - Java
