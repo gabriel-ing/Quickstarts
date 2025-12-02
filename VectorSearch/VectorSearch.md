@@ -1,10 +1,10 @@
 # Vector Search Quickstart
 
-Vector search is fundamental to many modern AI and machine learning techniques. Unstrutured data can be embedded into a vector position on a multi-dimensional plane, with the resulting position representing their semantic meaning. Data with the similar semantic meaning have vectors which are close to each other. Vector searches therefore can be used to quickly retrieve related information based on semantic meaning. 
+Vector search is fundamental to many modern AI and machine learning techniques. Unstrutured data can be embedded into a vector position on a multi-dimensional space, with the resulting position representing the data's semantic meaning. Data points with similar semantic meanings have vectors which are close to each other in the space. Vector searches can therefore be used to quickly retrieve relevant information based on the semantic meaning of the search query. 
 
-InterSystems IRIS has built in features for Vector search within the SQL dialect with the introduction of VECTOR and EMBEDDING data types.
-- VECTOR is for data already in vector format
-- EMBEDDING is used to convert an existing column to vectors, this requires configuration. 
+InterSystems IRIS has built in vector search capabilities within the SQL dialect, supporting both VECTOR and EMBEDDING data types.
+- VECTOR is for data already converted to vector format
+- EMBEDDING is used to convert an existing column to vectors within IRIS (this requires configuration) 
 
 This guide will focus on the use of the VECTOR data type, and the insertion of already generated vectors.
 
