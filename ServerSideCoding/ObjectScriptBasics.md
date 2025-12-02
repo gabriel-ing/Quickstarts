@@ -53,8 +53,10 @@ write:n=2 "Two" // Does not write anything as conditional not fulfilled
 
 
 //Basic For loop
-// iterator = 
+// for iterator : step : maximum{ ... }
 for i=1: 1: 10 {
-	write i 
-}
+	// ! is the new line operator
+	write i , ! 
+	
+}// Outputs the numbers between 1 and 10 (inclusive) on new lines
 ```

@@ -38,11 +38,12 @@ waiting on:
 
 
 
-Learning Flow: 
-Basic: 
+## Learning Flow: 
+
+### Basic: 
 
 ![alt text](BasicLearningFlow.png)
 
-Advanced: 
+### Advanced: 
 
 ![alt text](AdvancedLearningFlow.png)

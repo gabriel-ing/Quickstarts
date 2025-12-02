@@ -7,7 +7,7 @@ This is generally the most efficient method to use Python with InterSystems IRIS
 ```python
 Class packagename.PythonClass { 
 
-PARAMETER CONSTANTNAME = 2;
+Parameter CONSTANTNAME = 2;
 
 ClassMethod pythonClassMethod(a as %Integer, b as %Integer) [language=python]{ 
 	import iris
@@ -17,41 +17,56 @@ ClassMethod pythonClassMethod(a as %Integer, b as %Integer) [language=python]{
 	
 	value = (a+b) * constant
 	
-	s = f"The Sum of {a} and  {b} times {constant} equals {value}"
+	s = f"The result of ' ({a} + {b}) X {constant} ' is {value}"
 	print(s)
-	return value
 }
 }
 ```
 
-You can use IRIS classes by importing IRIS: 
+You could use this function from the ObjectScript terminal like normal: 
+```
+do ##class(packagename.PythonClass).pythonClassMethod(1,2)
+```
+This would print: 
+```
+The result of '(1 + 2) x 2' is 6
+```
+
+## Using Classes and Objects
+
+You can use other classes, including instantiating objects, from embedded python using the `iris` package. 
+
+**Please note `import iris` is different in Server-side (embedded) Python and client-side Python through the DB-API or IRIS-native API.**
+
+To use a class method: 
+
+```python
+classMethod PythonClassMethodCall(){
+	# import iris to access classes
+	import iris
+	iris.packagename.PythonClass.pythonClassMethod(2, 3)
+	# prints ` The result of ' (2 + 3) X 2 ' is 10 `
+}
+```
+
+To instantiate an object from a class: 
 
 ```python
 ClassMethod PythonIrisObjects() [language=python]{
-	# import iris to access classes
 	import iris
+
 	# Create new object
 	person = iris.packagename.Person._New()
-	person.Name = "name"
+	person.Name = "Jane Doe"
+	person.Age = 28
 	# Save the object
 	person._Save()
 }
 ```
 
-Note, any time objectscript uses a special character in a method, e.g. `%` and `$`, python will  replace these with underscores `_`
+Note, any time objectscript uses a special character in a method, e.g. `%` and `$`, these will be replaced by `_`, for example `.%New()` in ObjectScript becomes `_New()`.
 
-These methods can be used like any other class method: 
-
-```
-set value = ##class(packagename.PythonClass).PythonClassMethod(1, 2)
-- The Sum of 1 and 2 times 2 equals 6
-
-write value
-- 6  
-
-do ##class(packagename.PythonClass).PythonIrisObjects()
-// Saves a new person to database (person global)
-```
+These methods can be used like any other ClassMethod.
 
 #### Using Python Packages
 
@@ -61,17 +76,18 @@ You can install and use Python packages in InterSystems IRIS using the following
 python3 -m pip install --target <installdir>/mgr/python numpy
 ```
 
-This command installs `numpy` to the InterSystems IRIS install location. For help locating the correct python location, see  [Install and Import Python Packages](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=GEPYTHON_loadlib).
+This command installs `numpy` to the InterSystems IRIS install location. For help locating the correct python location, see [Install and Import Python Packages](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=GEPYTHON_loadlib).
 
 You can then use `numpy` as you would in regular Python scripts:  
+
 ```python
-ClassMethod NumpyExample() [language=python]
+ClassMethod NumpyExample() [ Language = python ]
 {
 	import numpy as np
-	data = np.array([1, 2, 3, 4, 5])
+	data = np.array([17, 2, 321, 444, 568])
 	mean_value = np.mean(data)
-	print("Mean:", mean_value)
-	
+	print("Mean:", mean_value) # Prints 270.4
 }
+
 ```
 

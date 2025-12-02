@@ -1,13 +1,21 @@
-# Using SQL in ObjectScript
+# Using SQL in Server-Side Code
 
+## ObjectScript
 ### Embedded SQL
 You can run SQL queries and transactions using objectscript in several ways. The simplest is Embedded SQL, this is only suitable for simple queries:
 
 ```
-&sql(SELECT Age INTO :age FROM Sample.Person WHERE Name="John Smith")
-write "John Smith is "_age_"Years Old"
+Class packagename.SQLBasics {
+
+ClassMethod BasicEmbeddedSQL()
+{
+  &sql(SELECT Name INTO :name FROM packagename.Person WHERE id = 1)
+  write "The first entry in the Person table is: ", name, !
+}
+}
 ```
 
+For more complicated queries with SQL, you can define and use a cursor. However, it is recommended to use Dynamic SQL, as shown below instead. To read more about Cursor-based embedded SQL, [see the documentation](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=GSQL_esql).
 
 ### Dynamic SQL:
 
@@ -51,40 +59,60 @@ Class packagename.SQLQuery Extends %RegisteredObject
   Query ByName (pStartsWith As %String) As %SQLQuery [ sqlProc ] 
   {
       SELECT ID, NAME,
-      FROM sample.Patient
+      FROM packagename.Person
       WHERE (Name %STARTSWITH @pStartsWith)
   }
-  ClassMethod UseQueryByName(name As %String){
-      Set statement = ##class(%SQL.Statement).%New()
-      Set status = statement.%PrepareClassQuery("packagename.SQLQuery", "ByName")
-      If $$$ISERR(Status){
-        Do $system.OBJ.DisplayError(status)
-      }
+```
+
+And the following class method in our SQLBasics class: 
+
+```
+ClassMethod UseQueryByName(name As %String)
+{
+    // Create Statement object
+    set statement = ##class(%SQL.Statement).%New()
+    
+    // Prepare Statement 
+    set status = statement.%PrepareClassQuery("packagename.SQLQuery", "ByName")
+    
+    // Handle Errors from Prepare status
+    if $$$ISERR(status){
+        do $system.OBJ.DisplayError(status)
+        quit
+    }
+    
+    // Execute statement
+    Set rs = statement.%Execute(name)
       
-      Set rs = Statement.%Execute(name)
-      
-      While rs.%Next(){
-        write rs.get("ID"), rs.get("NAME")
-      }
-      Do rs.%Close()
-  }
+    // Iterate over rows
+    While rs.%Next() {
+
+        // Write properties
+        write !, "ID: ", rs.%Get("ID")
+        write !, " Name: ", rs.%Get("Name")
+        write !, " Age: ", rs.%Get("Age")
+        write !
+    }
+
+    Do rs.%Close()
 }
+
 ```
 
 This method of running a SQL query in ObjectScript can be effective for creating complex queries. 
 
-You can also use the query direct as a function by adding Func to the query name. 
+You can also use the query direct as a function by adding Func to the query name:
 ```
-Class packagename.UseSQLQuery{
-  ClassMethod UseQueryByNameFunction(name As %String)
+ClassMethod UseQueryByNameFunction(name As %String)
   {
     set rs = ##class(packagename.SQLQuery).ByNameFunc()
     While rs.%Next(){
-      write rs.get("ID"), rs.get("NAME")
+      write !
+      write rs.%Get("ID")_"  "_rs.%Get("Name")_"  "_rs.%Get("Age")
     }
     do rs.%Close()
   }
-}
+
 ```
 
 ### Run SQL file
@@ -93,5 +121,63 @@ If you have a file containing SQL commands, you can run it from ObjectScript wit
 
 ```
   DO $SYSTEM.SQL.Schema.ImportDDL("c:\InterSystems\mysqlcode.txt",,"IRIS")
+```
+
+## SQLCODE
+
+Anytime SQL is run from ObjectScript, a built-in variable called SQLCODE is set to an Integer. This is set to: 
+
+- 0 : successful Completion
+- 100 : no data is retrieved (without error)
+- < 0 : Error Code
+
+SQLCODE can be used in error handling.
+
+
+
+## Embedded Python
+
+The usage in Embedded Python is similar to ObjectScript. We have the option between Embedded SQL and Dynamic SQL. We can also use SQL queries as defined [above](#using-a-query-component)
+
+To access Dynamic or Embedded SQL, we import `iris` and use `iris.sql`
+
+### Embedded SQL:
+```
+ClassMethod PythonEmbeddedSqlExample() [language = python]{
+  import iris
+  rs = iris.sql.exec("SELECT Name FROM packagename.Person")
+  print(rs)
+  for row in rs:
+    print(row)
+}
+```
+```
+["John Smith"]
+["Jane Doe"]
+```
+
+### Dynamic SQL:
+
+```
+ClassMethod PythonDynamicSqlExample() [ language = python]
+{
+  import iris
+  # Use ? as a placeholder
+  stmt = iris.sql.prepare("SELECT Name, Age FROM packagename.Person WHERE Age > ?" )
+
+  # pass in argument(s) for placeholder
+  age = 20
+  rs = stmt.execute(age)
+  # This will return a Python list of lists, you can iterate as follows:
+
+  for row in rs: 
+    print(row)
+
+}
+```
+This outputs:
+```
+["John Smith", 25]
+["Jane Doe", 28 ]
 ```
 

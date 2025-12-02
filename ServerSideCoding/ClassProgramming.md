@@ -45,13 +45,19 @@ Class packagename.ClassName Extends %Persistent
 			write !, i
 			
 			// Basic Conditional Format
-			if (i = 3) {
-				write !, "Fizz"
-			} elseif (i = 5){
-				write !, "Buzz"
-			} else{ 
+			// # is modulo operator (remainder)
+			if (i # 3 = 0) && (i # 5 = 0) {
+				write "  FizzBuzz"
+			} 
+			elseif (i # 3 = 0){
+				write "  Fizz"
+			} 
+			elseif (i # 5 = 0){
+				write "  Buzz"
+			}
+			else{ 
 				// .. denotes a property or method of the parent class
-				write !, ..VariableName
+				write "  "_..VariableName
 			}
 		}
 	}
@@ -62,9 +68,9 @@ Class packagename.ClassName Extends %Persistent
 You can call a ClassMethod without instantiating a class, using the do operator to run a method and  `##class()` to reference a class.
 
 ```
-do ##class(packagename.ClassName).AddNums(5, 6)
+do ##class(packagename.ClassName).AddNums(1, 2)
 
-- The sum of 5 and 6 is 11
+- The sum of 1 and 2 is 3
 ```
 
 You can instantiate a persistent object with;
@@ -83,27 +89,65 @@ write object.VariableName // prints Hello World to terminal
 A method can be used from an object:
 
 ```
-write object.FizzBuzz(1, 2)
+write object.FizzBuzz(15)
 ```
-
-Print the following:
+This outputs the following:
 ```
-1
-Hello World // (Variable name set above)
-3
-Fizz
-5
-Buzz
+1  Hello World 
+3  Fizz
+5  Buzz
+7  Hello World
+9  Fizz
+11  Hello World
+13  Hello World
+15  FizzBuzz
 ```
+This function uses the `CONSTANT` parameter as a step size, the `#` modulo operator to calculate a remainder, which is used for the conditional, and the `VariableName` property which was set above to output `Hello World`.
 
 
 ### Persistent classes 
 
-A `%Persistent` class is a class that can be saved directly into the database. They can be used in the following way:
+A `%Persistent` class is a class that can be saved directly into the database. Properties of a persistent class are projected into columns of a relational table, which can then be queried with SQL. A persistent class is created by extending (inheriting from) the `%Persistent` superclass. Persistent classes can also have methods, class methods, parameters or other class components. 
 
 ```
-set person = ##class(packageName.Person).%New()
-set person.Name = "John"
-set person.Age = 25
-do person.%Save() 
+Class packagename.Person Extends %Persistent{
+
+	// Person's Name
+	// As %String defines the data-type
+	Property Name As %String;  
+	
+	// Person's Age (in Years)
+	Property Age As %Integer; 
+}
 ```
+
+Persistent classes can be accessed as objects as follows: 
+```
+set person = ##class(packagename.Person).%New()
+set person.Name = "John Smith"
+set person.Age = 25
+do person.%Save()
+```
+Persistent classes are automatically given an ID upon saving. We can access the entry at a specific ID using `%OpenId`
+```
+set person2 = ##class(packagename.Person).%OpenId(2)
+write person2.Name // Outputs the name of the person with ID 2
+```
+
+### Persistent classes in SQL 
+
+A Persistent class can then be queried using SQL. 
+
+There are a number of methods for calling SQL, on the database, which are detailed in other tutorials, for example a query can be run from client-side applications connected through ODBC, JDBC or Python DB-API, from the Management Portal SQL explorer or server-side code. 
+
+```sql
+SELECT Name, Age FROM packagename.Person 
+```
+
+This would return the following table: 
+
+|Name|Age|
+|-----------|----|
+| John Smith| 25 |
+
+

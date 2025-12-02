@@ -23,7 +23,9 @@ Would create the following global:
 position: 4
 ```
 
-Subscripts and values can be any type. If you create a SQL table in InterSystems IRIS, it will be stored as a global, with each row being stored under a different index ID.
+Subscripts and values can be any type.
+
+If you create a SQL table in InterSystems IRIS, it will be stored as a global, with each row being stored under a different index ID.
 
 For a detailed explanation of globals, see: [Video: What Are Globals? | Youtube](https://www.youtube.com/watch?v=jJifoZq2bW0)
 
