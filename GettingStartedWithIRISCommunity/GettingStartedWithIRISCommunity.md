@@ -2,9 +2,9 @@
 
 InterSystems IRIS is an advanced data platform, providing SQL and NoSQL database management, server-side application coding and data-analytics in one, trusted, enterprise-grade product. InterSystems IRIS for Health uses InterSystems IRIS at the core, but includes additional healthcare features, including tools for a FHIR server, and built in handling of many healthcare data standards. 
 
-InterSystems IRIS Community and InterSystems IRIS-Health Community are free-to-use versions for experimentation, evaluation and non-commercial explorations of the platforms capabilities. There are certain resource and functionality limitations to prevent these editions being used in a production environment, for example the total data limit is 10 GB and the license key expires 1 year after release. However, these are a great resource to begin exploring how to use InterSystems IRIS.
+InterSystems IRIS Community and InterSystems IRIS-Health Community are free-to-use versions for experimentation, evaluation and non-commercial explorations of the platform's capabilities. There are certain resource and functionality limitations to prevent these editions being used in a production environment, for example the total data limit is 10 GB and the license key expires 1 year after the version's release. However, these are a great resource to begin exploring how to use InterSystems IRIS.
 
-While this article will largely focus on using InterSystems IRIS Community Edition, the same is true for InterSystems IRIS for Health Community Edition.
+While this article will focus on using InterSystems IRIS Community Edition, the same is true for InterSystems IRIS for Health Community Edition.
 
 InterSystems IRIS Community can be used in three ways: 
 - Run in a container using Docker
@@ -28,8 +28,8 @@ docker run --name my-iris --publish 52773:52773 --publish 1972:1972 -d intersyst
 ```
 To break this down: 
 - `run` is the docker command to run an image. It will search for the container locally, before then searching online with the `docker pull` command. Therefore, the `pull` command does not need to be run separately.
-- `intersystem/iris-community:latest-em` is the main parameter of the run command. This is the location of the InterSystems IRIS community Edition within the docker hub, which is the market place for container images. 
-    - `latest-em` is a tag for the version being downloaded, `em` stands for extended maintenance. you can also specify a version number, e.g. `2025.1` or `latest-cd` for the latest version in continuous development.
+- `intersystem/iris-community:latest-em` is the main parameter of the run command. This is the location of the InterSystems IRIS Community Edition within the docker hub, which is the market place for container images. 
+    - `latest-em` is a tag for the version being downloaded, `em` stands for extended maintenance. You can also specify a version number, e.g. `2025.1` or `latest-cd` for the latest version in continuous development.
 - `--name my-iris` gives your container the name my-iris, you can change this to anything you want, but it's useful to make it something memorable.
 - `publish` maps your local ports to the container ports (local:container). InterSystems IRIS sends binary data on Port 1972 and uses Port 52773 for web-server data.  If you have something running locally on ports 52773 or 1972, you can map the container ports to different ports. 
 - `-d` flag detaches your terminal so you can continue to use it. 
@@ -50,7 +50,7 @@ docker exec -it my-iris bash
 
 #### InterSystems IRIS for Health Community Edition
 
-To download the healthcare specific version of our core product, InterSystems IRIS for Health Community edition, the above command changes to: 
+To download the health-care specific version of our core product, InterSystems IRIS for Health Community edition, the above command changes to: 
 
 ```bash
 docker run --name my-iris --publish 52773:52773 --publish 1972:1972 -d intersystems/iris-health-community:latest-em
@@ -76,7 +76,7 @@ You can directly download InterSystems IRIS Community and InterSystems IRIS for 
 
 ![Evaluation.intersystems.com](Evaluation.png)
 
-Once signed in, on the page you will see a link to the Community Edtion. Click the Community Edition link to see the download options: 
+Once signed in, on the page you will see a link to the Community Edition. Click the Community Edition link to see the download options: 
 
 ![Evaluation.intersystems download page](EvaluationDownloadPage.png)
 
@@ -107,7 +107,7 @@ Note the instructions below are the same for InterSystems IRIS Community Edition
 
 Once signed in on AWS go to [InterSystems IRIS Community Edition on the AWS Marketplace](https://aws.amazon.com/marketplace/pp/prodview-tdzm2pjb7opqs?utm_source=DC)
 
-![Iris Community On AWS](IrisCommunityAWS.png)
+![Iris Community On AWS](IrisCommunityAws.png)
 
 Click `View Purchase Options` to see the "Subscribe to InterSystems IRIS Community Edition page". This page includes Terms and Conditions, along with pricing details, which shows the Total amount as $0.00.
 
@@ -174,9 +174,9 @@ Where `?` values replace is the server IP address.
 
 #### Terminating Instance
 
-When you are finished working with your InterSystems IRIS Community Edition instance, its worth Terminating it to avoid excess charges (or wasting the free credits if you are using the free tier).
+When you are finished working with your InterSystems IRIS Community Edition instance, consider terminating it to avoid excess charges (or wasting free credits).
 
 ![Terminate Instance](TerminateInstance.png)
 
-So there you have it, a functional version of InterSystems IRIS running completely for free on the cloud!
+You now have a fully functional InterSystems IRIS instance running in the cloud—completely free and ready for exploration.
 

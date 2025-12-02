@@ -1,7 +1,6 @@
-# Setting Up Your Development Environment In VS Code
+# Setting Up Your Development Environment in VS Code
 
-This page is a brief reference guide to getting started using the recommended ObjectScript development environment, VS Code. The guide is not comprehensive, but should have enough information to get started. For comprehensive information, see "Further Resources".
-
+This page provides a quick reference guide to setting up and using the recommended InterSystems IRIS and ObjectScript development environment with VS Code. For comprehensive information, see [].
 
 VS Code is the recommended development platform for IRIS and ObjectScript code.  VS Code is widely used, available on Windows, Mac and Linux, and can be downloaded from the [VS Code website](https://code.visualstudio.com/download). 
 
@@ -26,19 +25,39 @@ To create a new server connection, make sure your IRIS instance is running, then
 ![Add Server Button](images/vs-code-add-server-button.png)
 
 You will then be prompted for the details of your server: 
+
 ![Prompted for details](images/vs-code-prompted-for-details.png)
+
 It will ask you the following: 
 
 - **Name** : Give your server a memorable name.
 - **Description**: Optional description of your server.
 - **Hostname or IP Address** : Server location, this is `localhost` if you are running locally. 
 - **Port**: The web-server port number (52773 is default for IRIS)
-- **Path Prefix**: (Optional) If a web-server hosts multiple InterSystems servers, the URL for the server may have an additional Path prefix. As an example, for a server URL of https://samplehost.com:8080/irisprod/ the path prefix would be "/irisprod". 
+- **Path Prefix**: (Optional) If a web-server hosts multiple InterSystems servers, the URL for the server may have an additional Path prefix. As an example, for a server URL of https://samplehost.com:8080/production/ the path prefix would be "/production". 
 - **Username**: (Optional) Username on server. If it is not provided, you will be prompted each time you connect.
-- **Connection Type**: HTTP/HTTPS (localhost is HTTP)
+- **Connection Type**: HTTP/HTTPS (HTTP for Localhost)
 
 This will create a `settings.json` file with the connection details: 
-![settings.json](images/vs-code-settings.json.png)
+
+
+
+```json
+{
+	"intersystems.servers": {
+		"iris-demo" : {
+			"webServer": {
+				"scheme": "http",
+				"host" : "localhost",
+				"port" : 52773
+			},
+			"username": "SuperUser"
+		}
+	}
+}
+```
+
+
 You can access this by right clicking on the server definition and choosing edit settings.
 
 After adding these settings, you can try to connect by clicking the refresh icon, or right clicking on the server definition and choosing refresh. You will be prompted for the password (you may also be prompted for your username). You can save the password by clicking the key icon at the top-right of the entry box. 
@@ -99,11 +118,11 @@ To manually Import and Compile the file, right click on the file in the Workspac
 
 ### Recommended Third Party Extensions
 
-- Source control and **Git** - VS Codes built in support of git makes managing source control easy.
+- Source control and **Git** - VS Codes built in support of Git makes managing source control easy.
 - **Container tools** and **Docker** extensions 
 - **SQLTools for IRIS** - Lightweight SQL connection for quick queries. Community supported but not officially supported. 
--  **Jupyter** and **Jupyter Server Proxy for InterSystems IRIS** for jupyter notebook support in VS code.
-- **REST Client** - allows sending of HTTP Requests from VS Code 
+-  **Jupyter** and **Jupyter Server Proxy for InterSystems IRIS** for Jupyter Notebook support in VS code.
+- **REST Client** - allows sending of HTTP Requests from VS Code.
 
 
 
