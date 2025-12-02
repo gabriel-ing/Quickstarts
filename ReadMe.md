@@ -7,7 +7,6 @@ Currently have first drafts of:
 - [Server-side coding (ObjectScript/Classes/Embedded Python)](ServerSideCoding/GettingStartedWithServer-sideCoding.md)
 - [External Python](ExternalPython/ExternalPythonQuickstart.md)
 - [REST](REST-Quickstart/REST-V2.md)
-
 - [Vector Search](VectorSearch/VectorSearch.md)
 - [Creating a FHIR Server ](FHIRServer/CreateAFHIRSeverIn5Minutes.md) 
     - This might benefit from another related page on using the FHIR server
@@ -26,15 +25,24 @@ Currently have first drafts of:
         - [Using the Production](Interoperability/6-UsingTheProduction.md) 
     - I picture these being a sequence of pages or tabs on the same page.
 
+By Irene: 
+- Java
+- C#
 
 
 WIP: 
 - node.js
 
-
-By Others:
-- Java
-- .NET
+waiting on: 
 - Analytics
 
 
+
+Learning Flow: 
+Basic: 
+
+![alt text](BasicLearningFlow.png)
+
+Advanced: 
+
+![alt text](AdvancedLearningFlow.png)
