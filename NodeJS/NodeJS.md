@@ -129,25 +129,6 @@ console.log(`New age is ${new_age}`) // Prints "New age is 30
 person.invokeVoid("%Save")
 ```
 
-## Running SQL queries
-
-SQL queries can be run using the `%SQL.Statement` class: 
-
-```
-const statement =  iris.classMethodObject("%SQL.Statement", "%New");
-
-const prepStatus = statement.invoke("Prepare", "SELECT ? FROM sample.Person ");
-
-if (prepStatus != 1){
-    console.log("Error with Prepare statement");
-} else{
-    const resultSet = statement.invoke("execute", ["Name"]);
-    console.log(resultSet);
-}
-
-
-```
-
 
 ## Community libraries
 
