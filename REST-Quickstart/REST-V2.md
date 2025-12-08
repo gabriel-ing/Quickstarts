@@ -9,7 +9,7 @@ In this example, we are going to create a REST API for a basic task management s
 
  ## Persistent class
 
- Before starting with the REST Portion of this guide, we need to create a table to contain the task data. This will be queried using the REST. 
+ Before starting with the REST portion of this guide, we need to create a table to contain the task data. This will be queried using the REST. 
 
 ```
 Class TaskManager.tasks Extends (%Persistent, %JSON.Adaptor)
@@ -38,7 +38,7 @@ In our case, each task is going to have the following properties:
 - Description
 - Status
 - Due Date
-- Date Last modified
+- Date Last Modified
 
 Depending on the request, there will be slight differences as to what information is required in the request. 
 
@@ -47,7 +47,7 @@ Depending on the request, there will be slight differences as to what informatio
     - Title
     - Description
     - Due Date
-- A Put request updates a task, this needs an ID, as well as whatever is being updated. 
+- A PUT request updates a task, this needs an ID, as well as whatever is being updated. 
 
 Creating a full OpenAPI specification is beyond the scope of this guide, but below are some tips to get started: 
  - You can create and edit a specification with the online Swagger Editor at https://editor.swagger.io/
@@ -69,7 +69,7 @@ docker cp task-manager-swagger-spec.json myiris:/home/irisowner/
  do %^REST
  ```
 
- This will start a command line interface to create a new REST application: 
+This will start a command line interface to create a new REST application: 
 ```
  USER>do ^%REST
 REST Command Line Interface (CLI) helps you CREATE or DELETE a REST application.
@@ -135,9 +135,9 @@ Using the ^%REST routine creates an Implementation Class (`impl.cls`) and a spec
 
 To view and edit the settings of a Web-Application go to `System Administration -> Security -> Applications -> Web Applications` and select the application name (`/csp/TaskManager`) from the list.
 
-For development, you may wish to bipass Authentication, in which case tick the `Unauthenticated` checkbox next to `Allowed Authenticated Methods`. 
+For development, you may wish to bypass Authentication, in which case tick the `Unauthenticated` checkbox next to `Allowed Authenticated Methods`. 
 
-You may also wish to define what access a User of your web-application automatically has. If so,  switch to the `Application Roles`, select the desired application roles from the Availble list, and then click Assign. For local development, you may wish to allow `%All` access, but for production you will need to be more careful about access and roles. 
+You may also wish to define what access a User of your web-application automatically has. If so,  switch to the `Application Roles`, select the desired application roles from the Avalible list, and then click Assign. For local development, you may wish to allow `%All` access, but for production you will need to be more careful about access and roles. 
 
 ## Implementation class
 
@@ -151,8 +151,6 @@ ClassMethod getTasks() As %DynamicObject
     //Do ..%SetHeader(<name>,<value>)
     //Quit (Place response here) ; response may be a string, stream or dynamic object
 }
-
-
 
 ### POST request implementation
 
@@ -203,7 +201,7 @@ Accept: application/json
 
 ### GET requests
 
-Next, lets implement the GET requests. Here we have two endpoints, one general `/tasks` which returns all the information in the database, and one `/tasks/<taskid>` which just returns one. Lets start with the latter of these because it is easier to implement: 
+Next, let's implement the GET requests. Here we have two endpoints, one general `/tasks` which returns all the information in the database, and one `/tasks/<taskid>` which just returns one. Let's start with the latter of these because it is easier to implement: 
 
 ```
 ClassMethod getTaskById(taskId As %String) As %DynamicObject
@@ -260,7 +258,7 @@ SELECT JSON_OBJECT("prop-name":ColName) FROM tablename;
 SELECT JSON_OBJECT('ID':ID,'Title':Title,'Description':Description,'DueDate':DueDate,'DateLastModified':DateLastModified,'Status':Status) FROM TaskManager.tasks;
 ```
 
-To aggrgate a column into a JSON array we can use: 
+To aggregate a column into a JSON array we can use: 
 ```sql
 SELECT JSON_ARRAYAGG(ColName) FROM tableName
 /*To combine these for our case*/
@@ -316,7 +314,7 @@ GET http://localhost:52773/csp/TaskManager/tasks
 
 ### PUT request
 
-The PUT request updates a task. The main forseeable use for this is to update the task status from "Pending", to "In-progress", to "Complete", but its also good to allow for updates for Typos in the title and description. The code for this is identical to the POST `createTasks()` function, except rather than creating a new object, it opens an existing one with `.%OpenID`.
+The PUT request updates a task. The main foreseeable use for this is to update the task status from "Pending", to "In-progress", to "Complete", but its also good to allow for updates for Typos in the title and description. The code for this is identical to the POST `createTasks()` function, except rather than creating a new object, it opens an existing one with `.%OpenID`.
 
 ```
 

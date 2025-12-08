@@ -1,8 +1,8 @@
-# Connecting to InterSystems IRIS from Python Applications 
+# Connecting to InterSystems IRIS from Client-Side Python Applications 
 
-Much of the functionality of InterSystems IRIS can be accessed from Python programs which run externally to the InterSystems IRIS instance. This is distinct from Embedded Python, which exists  inside InterSystems IRIS classes and is run by the same server as the ObjectScript code and databases. 
+Much of the functionality of InterSystems IRIS can be accessed from Python programs that run externally to the InterSystems IRIS instance. This is distinct from Embedded Python, which exists with classes and is run within InterSystems IRIS.
 
-This guide refers to connecting to instances of InterSystems IRIS using applications run on other servers or computers. This connection can be made to allow access to InterSystems IRIS databases, or to run scripts or functions on the InterSystems IRIS server. 
+This guide refers to connecting to instances of InterSystems IRIS using applications run on the client-side, i.e. not on the same server as InterSystems IRIS. This connection can be made to allow access to InterSystems IRIS databases, or to run scripts or functions on the InterSystems IRIS server. 
 
 ## Installing the Python Software Development Kit
 
@@ -26,11 +26,11 @@ password = "SYS"
 connection = iris.connect(server, port, namespace, username, password)
 ```
 
-From the connection object, you can either create a irispy object to access globals and server-side methods, or create a cursor object to run SQL queries on a database. 
+From the connection object, you can either create a `irispy` object to access globals and server-side methods, or create a `cursor` object to run SQL queries on a database with the DB-API. 
 
 ## Running SQL queries
 
-SQL queries on the database can be run with the Python DB-API or with SQL alchemy.
+SQL queries on the database can be run with the Python DB-API or with SQLAlchemy.
 
 ### DB-API
 
@@ -47,11 +47,9 @@ cursor.execute(sql)
 results_set = cursor.fetchone() 
 
 # Fetch 5 rows
-
 results_set = cursor.fetchmany(5)
 
 # Fetch all (remaining) rows
-
 results_set = cursor.fetchall() 
 
 ```
@@ -92,7 +90,7 @@ SQLAlchemy is a Python SQL client which is supported by InterSystems. It can be 
 pip install "sqlalchemy-iris[intersystems]"
 ```
 
-This install the InterSystems specific SQLAlchemy driver, as well as the normal SQLAlchemy as a dependency. It is used as follows: 
+This install the InterSystems-specific SQLAlchemy driver, as well as the normal SQLAlchemy as a dependency. It is used as follows: 
 
 ``` python
 from sqlalchemy import create_engine 
@@ -186,7 +184,7 @@ irispy.kill("myGlobal")
 connection.close()
 ```
 
-You can also this `irispy` object to used with server-side classes and methods. You call class method using `irispy.classMethodValue` or `irispy.classMethodVoid`, where value and void specify whether anything is returned from the class method. If you need specific return types, you also used `irispy.classMethodString`, or replace `String` with another datatype. 
+You can also use the irispy object with server-side classes and methods. You call class method using `irispy.classMethodValue` or `irispy.classMethodVoid`, where value and void specify whether anything is returned from the class method. If you need specific return types, you also used `irispy.classMethodString`, or replace `String` with another datatype. 
 
 So we could use the following IRIS class:
 
@@ -246,7 +244,7 @@ Class sample.Person Extends %Persistent
 You could use this in an external Python application with: 
 
 ```python
-# Create new class obeject 
+# Create new class object 
 person = irispy.classMethodObject("sample.Person", "%New")
 
 # Set a property
@@ -268,5 +266,5 @@ person.invokeVoid("%Save")
 
 ```
 ### Further Reading
-- [Orientation for Python Developers | Orientation for Python Developers | InterSystems IRIS Data Platform 2025.2](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=GPYDEV_journey)
-- [Introduction to the Native SDK for Python | Using the Native SDK for Python | InterSystems IRIS Data Platform 2025.2](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=BPYNAT_about)
+- [Orientation for Python Developers | Orientation for Python Developers | InterSystems IRIS Data Platform](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=GPYDEV_journey)
+- [Introduction to the Native SDK for Python | Using the Native SDK for Python | InterSystems IRIS Data Platform ](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=BPYNAT_about)
