@@ -1,4 +1,4 @@
-# Downloading an Install Kit
+# Get InterSystems IRIS Community Edition with an Install Kit
 
 You can directly download InterSystems IRIS Community and InterSystems IRIS for Health Community from https://evaluation.intersystems.com/Eval/. You will need to sign in with an InterSystems single-sign-on window, if you do not already have an account you can create one for free.
 

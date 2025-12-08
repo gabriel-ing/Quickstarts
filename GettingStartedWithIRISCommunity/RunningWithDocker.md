@@ -1,12 +1,12 @@
-## Running with Docker
+# Get InterSystems IRIS Community with Docker
 
 The easiest way to get started using InterSystems IRIS Community Edition is to use Docker. Docker is a containerization framework that runs software in a standardized environment. In this way, the install process is the same for all operating systems. 
 
-### 1. Install Docker
+## 1. Install Docker
 
 Docker can be downloaded from their [website](https://docs.docker.com/get-started/get-docker/). 
 
-### 2. Download and Run the InterSystems IRIS Community Edition
+## 2. Download and Run the InterSystems IRIS Community Edition
 
 The process of downloading and running the InterSystems IRIS Community Edition can be performed by a single command: 
 
@@ -35,7 +35,7 @@ or a bash terminal with:
 docker exec -it my-iris bash
 ```
 
-#### InterSystems IRIS for Health Community Edition
+### InterSystems IRIS for Health Community Edition
 
 To download the health-care specific version of our core product, InterSystems IRIS for Health Community edition, the above command changes to: 
 
