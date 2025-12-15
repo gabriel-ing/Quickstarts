@@ -143,7 +143,7 @@ You may also wish to define what access a User of your web-application automatic
 
 The implementation class (`impl.cls`) will be generated with stub methods for the operations detailed in the OpenAPI specification. This will be in the package name given as the name for the new application (`TaskManager`) in this example. 
 
-
+```objectscript
 ClassMethod getTasks() As %DynamicObject
 {
     //(Place business logic here)
@@ -151,6 +151,7 @@ ClassMethod getTasks() As %DynamicObject
     //Do ..%SetHeader(<name>,<value>)
     //Quit (Place response here) ; response may be a string, stream or dynamic object
 }
+```
 
 ### POST request implementation
 
@@ -255,16 +256,29 @@ To create a JSON object from each row we can use the following syntax
 ```sql
 SELECT JSON_OBJECT("prop-name":ColName) FROM tablename; 
 /*Or in our case*/
-SELECT JSON_OBJECT('ID':ID,'Title':Title,'Description':Description,'DueDate':DueDate,'DateLastModified':DateLastModified,'Status':Status) FROM TaskManager.tasks;
+SELECT JSON_OBJECT('ID':ID,
+'Title':Title,
+'Description':Description,
+'DueDate':DueDate,
+'DateLastModified':DateLastModified,
+'Status':Status) 
+FROM TaskManager.tasks;
 ```
 
-To aggregate a column into a JSON array we can use: 
+To aggregate a column into a JSON array we can use:
+
 ```sql
 SELECT JSON_ARRAYAGG(ColName) FROM tableName
 /*To combine these for our case*/
 
-SELECT JSON_ARRAYAGG(JSON_OBJECT(
-    'ID':ID,'Title':Title,'Description':Description,'DueDate':DueDate,'DateLastModified':DateLastModified,'Status':Status
+SELECT JSON_ARRAYAGG(
+    JSON_OBJECT(
+    'ID':ID,
+    'Title':Title,
+    'Description':Description,
+    'DueDate':DueDate,
+    'DateLastModified':DateLastModified,
+    'Status':Status
 )) FROM TaskManager.tasks;
 
 ```
