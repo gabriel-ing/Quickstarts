@@ -1,4 +1,4 @@
-# REST Quickstart
+# Creating a REST Application
 
 There are many ways to create a REST API with IRIS, this guide shows how to create a REST API using a specification-first approach. This method is the recommended way to easily create REST APIs. 
 
@@ -6,8 +6,7 @@ A specification first approach means that the base classes for the REST process 
 
 In this example, we are going to create a REST API for a basic task management system, allowing Create, Retrieve, Update and Delete (CRUD) operations to the InterSystems IRIS database. 
 
-
- ## Persistent class
+## 1. Defining the data table (persistent class)
 
  Before starting with the REST portion of this guide, we need to create a table to contain the task data. This will be queried using the REST. 
 
@@ -27,7 +26,7 @@ Property DateLastModified As  %Library.Date;
 }
 ```
 
-## Creating a Specification
+## 2. Creating a Specification
 
 The first step of designing a REST API is considering what information needs to be passed between the Client (the front-end calling the HTTP methods) and the Server (the database). 
 
@@ -61,7 +60,7 @@ To use a spec-first approach, you need the specification to be on the server. If
 docker cp task-manager-swagger-spec.json myiris:/home/irisowner/
 ```
 
- ## Creating the REST Classes
+ ## 3. Creating the REST Service using ^%REST
 
  The easiest way to create a REST API in InterSystems IRIS is using the ^%REST routine. Open an InterSystems IRIS terminal and run the following: 
 
@@ -139,7 +138,7 @@ For development, you may wish to bypass Authentication, in which case tick the `
 
 You may also wish to define what access a User of your web-application automatically has. If so,  switch to the `Application Roles`, select the desired application roles from the Avalible list, and then click Assign. For local development, you may wish to allow `%All` access, but for production you will need to be more careful about access and roles. 
 
-## Implementation class
+## 4. Implementing Methods (Implementation Class)
 
 The implementation class (`impl.cls`) will be generated with stub methods for the operations detailed in the OpenAPI specification. This will be in the package name given as the name for the new application (`TaskManager`) in this example. 
 
@@ -153,7 +152,7 @@ ClassMethod getTasks() As %DynamicObject
 }
 ```
 
-### POST request implementation
+### Create a Task (POST)
 
 Let's start by writing the implementation of the POST request to create a task. To do this, we simply need to create an instance of our persistant class, import the post request body with `.%JSONImport(body)` and save it to our database. 
 
@@ -200,7 +199,7 @@ Accept: application/json
 ```
 
 
-### GET requests
+### Recieve a task (GET 1)
 
 Next, let's implement the GET requests. Here we have two endpoints, one general `/tasks` which returns all the information in the database, and one `/tasks/<taskid>` which just returns one. Let's start with the latter of these because it is easier to implement: 
 
@@ -247,6 +246,7 @@ Content-Type: application/json
   "DueDate": "2025-11-25"
 }
 ```
+### Recieve all Tasks (GET all)
 
 The getTasks() function is a bit more tricky to implement because we need to create a JSON array containing all of our individual rows of the database as JSON objects. There are many ways to do this, for example it is possible to retrieve all the IDs with SQL, iterate over the IDs opening each file and exporting a JSON string. 
 
@@ -297,7 +297,8 @@ write name
     FROM TaskManager.tasks)
 
 ```
-As some datatypes (particularly Date and Time) are saved in a particular formats in the database, it can be important to set the output format. For Embedded SQL (anything with `&sql()`), this can be set by adding the following: 
+
+As some datatypes (particularly Date and Time) are saved in a different format in the database, it can be important to set the output format. For Embedded SQL (anything with `&sql()`), this can be set by adding the following: 
 
 ```
 #sqlcompile select=ODBC
@@ -326,7 +327,7 @@ We can test this with the following get request:
 GET http://localhost:52773/csp/TaskManager/tasks
 ```
 
-### PUT request
+### Update a task (PUT)
 
 The PUT request updates a task. The main foreseeable use for this is to update the task status from "Pending", to "In-progress", to "Complete", but its also good to allow for updates for Typos in the title and description. The code for this is identical to the POST `createTasks()` function, except rather than creating a new object, it opens an existing one with `.%OpenID`.
 
@@ -370,7 +371,18 @@ Accept: application/json
 
 ```
 
-### Delete Request
+### Delete a task (DELETE)
+Finally, we can implement the deletion of a task very simply using the `.%DeleteId()`:
+```
+ClassMethod deleteTask(taskId As %String) As %DynamicObject
+{
+    set status = ##class(TaskManager.tasks).%DeleteId(taskId)
+    if 'status=1 do ..%SetStatusCode(404) quit {"Response":"Could not delete object"}
+
+    return {"Response":"Task Deleted"}
+}
+```
+And again, we can test it with the following request:
 ```http
 DELETE http://localhost:52773/csp/TaskManager/tasks/7
 Accept: application/json
@@ -378,7 +390,7 @@ Accept: application/json
 
 
 
-## Requesting and Debugging
+## 5. Requesting and Debugging
 
 API requests can be sent with a number of REST clients, including from Python and Javascript/TypeScript. Postman is a recommended dedicated REST client for testing and using a REST service, while for simple queries, you can save the query (in the format given above) as a .http file, and then send it from VS Code with the [REST Client Extension](https://marketplace.visualstudio.com/items?itemName=humao.rest-client). 
 
@@ -394,7 +406,7 @@ set ^test(1) = "Done JSON Export"
 
 For more sophisticated debugging, there is a [debugging tool](https://docs.intersystems.com/components/csp/docbook/DocBook.UI.Page.cls?KEY=GVSCO_debug#GVSCO_debug_rest) included in the [VS Code ObjectScript Extensions pack](https://marketplace.visualstudio.com/items?itemName=intersystems-community.objectscript-pack) which includes functionality to debug REST APIs.
 
-## Working with CORS
+### Working with CORS
 
 Cross-Origin Resource Sharing (CORS) is a security mechanism that controls how web applications running in one domain can access resources for another domain. It is an important security measure and should be handled with care for production purposes. 
 
@@ -408,9 +420,9 @@ In the specification class (`spec.cls`), add:
 Parameter HandleCorsRequest = 1;
 ```
 
-#### 2. Add specific CORS dispatch class
+### 2. Add specific CORS dispatch class
 
-Create a new class with the following: 
+Create a new class, TaskManger/cors.cls with the following:
 
 ```
 Class TaskManager.cors Extends %CSP.REST
@@ -432,12 +444,12 @@ ClassMethod OnHandleCorsRequest(url As %String) As %Status
 
 This will set a header to each request, which can allow various settings to be configured. 
 
-
 To call the CORS dispatch class, we need to add the following line to our OpenAPI specification in `spec.cls`: 
 
 ```
 "x-ISC_DispatchParent":"TaskManager.cors",
 ```
+
 This refers to the `TaskManager/cors.cls` class defined above, so change the name as appropriate. This line is shown in the context of the OpenAPI specification below: 
 
 ```
@@ -454,8 +466,16 @@ XData OpenAPI [ MimeType = application/json ]
   
 ```
 
-#### 3. Configure CSPSystem User settings
+### 3. Configure CSPSystem User settings
 
 REST requests are by default performed in InterSystems IRIS by the user `CSPSystem`, unless other credentials are provided. Therefore, if one is accessing the REST API without authentication, it is important to make sure the `CSPSystem` user has suitable access to the SQL tables, and to Assign it relevant roles. 
 
 To edit the account access go to `System -> Security -> Users`. 
+
+## Conclusion
+
+In this guide, we have created a simple REST service to handle the creating, recieving, updating and deleting of resources from an InterSystems IRIS database. This framework is fundamental to using InterSystems IRIS as a back-end database.
+
+The basic example also demonstrated how the application logic for these can be fully customisable and make use of numerous data models and different ways of querying the database. A more complicated example could combine these, taking results from different SQL queries, key-value look ups through direct globals access and object models.
+
+REST can also be used to expose different application logic by calling different classes within the implementation functions.
