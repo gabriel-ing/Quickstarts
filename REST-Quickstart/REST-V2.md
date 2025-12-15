@@ -316,8 +316,32 @@ GET http://localhost:52773/csp/TaskManager/tasks
 
 The PUT request updates a task. The main foreseeable use for this is to update the task status from "Pending", to "In-progress", to "Complete", but its also good to allow for updates for Typos in the title and description. The code for this is identical to the POST `createTasks()` function, except rather than creating a new object, it opens an existing one with `.%OpenID`.
 
-```
+```objectscript
+ClassMethod updateTask(taskId As %String, body As %DynamicObject) As %DynamicObject
+{
+    // Instantiate new task object
+    set task = ##class(TaskManager.tasks).%OpenId(taskId)
 
+    // Import Json body
+    set status =  task.%JSONImport(body)
+    
+    // Json Import error handling
+    if ('status=1) {
+        do ..%SetStatusCode(406)
+        quit "Error importing JSON"}
+    
+    // Save object to database
+    set savestatus =  task.%Save()
+
+    // Saving object error handling
+    if 'savestatus=1 do ..%SetStatusCode(500) quit "Error saving object"
+
+    // Populate response 
+    set response = {}
+    set response.Response = "Task modified in the database"
+    // Return response
+    return response
+}
 ```
 
 Test with a PUT request as follows:
