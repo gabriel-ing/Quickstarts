@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mermaid Chart</title>
+    <!-- Include Mermaid.js from CDN -->
+    <script src="https://unpkg.com/mermaid@11.12.2/dist/mermaid.min.js"></script>
+    <script src="https://unpkg.com/dom-to-image@2.6.0/src/dom-to-image.js"></script>
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .mermaid {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <button id="save-button">Save SVG</button>
+    <div height="100px"></div>
+    <div class="mermaid" id="mermaid-chart">
+flowchart TD
+
+
+subgraph root [sample.PetsD]
+a[3]
+end
+subgraph node1 [1]
+H["['','Whiskers','Cat',3]"]
+end
+subgraph node2 [2]
+D["['','Fido','Dog',5]"]
+end
+subgraph node3 [3]
+G["['','Bugs','Rabbit',95]"]
+end
+
+
+
+
+
+
+root-->node1
+root-->node2
+root-->node3
+
+    </div>
+
+    <script>
+
+  mermaid.initialize({
+    startOnLoad: true,          // we'll run explicitly
+    theme: 'base',
+    look: 'handDrawn',
+    
+    flowchart: { htmlLabels: true },   
+    sequence: { useMaxWidth: true }    
+  });
+
+  // Ensure diagrams exist in the DOM, then render:
+//    await mermaid.run({ querySelector: '.mermaid' });
+
+
+        document.getElementById("save-button").addEventListener("click", (event)=>{
+            const div = document.getElementById("mermaid-chart")
+            const chart = div.querySelector(':scope > svg');
+            domtoimage.toPng(chart)
+                .then(function (dataUrl) {
+                const a = document.createElement('a');
+                a.href = dataUrl;
+                a.download = 'diagram.png';
+                a.click();
+                })
+                .catch(function (error) {
+                    console.error('oops, something went wrong!', error);
+    });
+        })
+
+        
+    </script>
+</body>
+</html>
