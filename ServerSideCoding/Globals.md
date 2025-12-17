@@ -8,13 +8,13 @@ Globals can be visualised as a tree diagram, where each node of the tree has a k
 
 ![alt text](images/Global-0.png)
 
-Globals are described as sparse, because nodes exist without a value if a sub-node exists. For example, in the diagram above, the Subscript2 node does not have a value, and only exists because the node at Subscript 3 is defined as `^GlobalName("Subscript1", "Subscript2", "Subscript3) = Value`. An empty node, like that at Subscript2 does not cost any resources.
+Globals are described as sparse, because nodes exist without a value if a sub-node exists. For example, in the diagram above, the Subscript2 node does not have a value, and only exists because the node at Subscript 3 is defined as `^GlobalName("Subscript1", "Subscript2", "Subscript3") = Value`. An empty node, like that at Subscript2 does not cost any resources.
+
+Reading and writing to globals has been optimised over decades and is incredibly fast, a fact which makes InterSystems IRIS one of the fastest databases available.
 
 ### Datatypes
 
-Both the keys and values within global structures can be of multiple different types, global can be used as a standard numbered array, by setting nodes as sequential integer numbers. Values can also be lists. 
-
-Reading and writing to globals has been optimised over decades and is incredibly fast.
+Both the keys and values within global structures can be of multiple different types, global can be used as a standard numbered array, by setting nodes as sequential integer numbers. Values can also be lists.
 
 ![alt text](images/global-1.png)
 
@@ -95,6 +95,8 @@ zwrite ^sample.PetsD
 */
 ```
 Here, the root node has the value 1, this shows the number of data points added. The data is stored at global node 1 as a list object, with each of the rows.
+
+The list begins with an empty value, this value is reserved for the subclass name of any subclasses of the Pets class.
 
 To access a specific value, we can use `.%OpenId()`:
 

@@ -23,29 +23,42 @@
     <div height="100px"></div>
     <div class="mermaid" id="mermaid-chart">
 flowchart TD
+    bird["Birds of North America"]
 
+    subgraph Anatidae["Anatidae"]
+        Anatidae_val["Ducks, Geese and Swans"]
+    end
 
-subgraph root [sample.PetsD]
-a[3]
-end
-subgraph node1 [1]
-H["['','Whiskers','Cat',3]"]
-end
-subgraph node2 [2]
-D["['','Fido','Dog',5]"]
-end
-subgraph node3 [3]
-G["['','Bugs','Rabbit',95]"]
-end
+    subgraph Aix["Aix"]
+        Aix_val["Wood Duck"]
+    end
 
+    subgraph Anas["Anas"]
+        Anas_val["American Black Duck"]
+    end
 
+    subgraph Branta["Branta"]
+        Branta_val["Barnacle Goose"]
+    end
 
+    subgraph Odontophoridae["Odontophoridae"]
+        Odontophoridae_val["New World Quails"]
+    end
 
+    subgraph Callipepia["Callipepia"]
+        Callipepia_californica["California Quail"]
+        Callipepia_gambelii["Gambel's Quail"]
+    end
 
+    bird --> Anatidae
+    bird --> Odontophoridae
 
-root-->node1
-root-->node2
-root-->node3
+    Anatidae --> Aix
+    Anatidae --> Anas
+    Anatidae --> Branta
+
+    Odontophoridae --> Callipepia
+
 
     </div>
 
@@ -54,7 +67,19 @@ root-->node3
   mermaid.initialize({
     startOnLoad: true,          // we'll run explicitly
     theme: 'base',
-    look: 'handDrawn',
+    themeVariables :{
+        
+        primaryColor: '#3f38c7',
+        primaryTextColor: '#fff',
+        primaryBorderColor: '#2F2A95',
+        lineColor: '#000000',
+        secondaryColor: '#00B2A9',
+        tertiaryColor: '#00B2A9',
+        tertiaryTextColor: "#000000",
+        fontSize:"20px",
+        systemFontWeight:"700",
+    },
+    look: 'classic',
     
     flowchart: { htmlLabels: true },   
     sequence: { useMaxWidth: true }    
