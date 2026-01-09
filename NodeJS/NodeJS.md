@@ -49,7 +49,7 @@ If you need specific return types, you also used `irispy.classMethodString`, or 
 
 So we could use the following IRIS class:
 
-```
+```objectscript
 Class sample.DemoClass 
 {
 ClassMethod AddNumbers(a As %Integer, b As %Integer) As %Integer
@@ -83,9 +83,9 @@ console.log(irisjs.get("DemoGlobal", 1)) // Prints "Hello World"
 
 ```
 
-You can also create a class object, for example, say you had the IRIS class: 
+You can also create a class object, for example, say you had the IRIS class:
 
-```
+```objectscript
 Class sample.Person Extends %Persistent
 {
 
@@ -137,5 +137,5 @@ There are several community libraries that can integrate with InterSystems IRIS,
 - [TypeORM-IRIS](https://openexchange.intersystems.com/package/typeorm-iris) By Dmitry Maslennikov
     This library connects to InterSystems IRIS using a the Type-ORM framework, allowing better access to databases in with SQL. 
 
-- [mg-dbx](https://github.com/chrisemunt/mg-dbx)/ [mg-dbx-napi](https://github.com/chrisemunt/mg-dbx-napi) by MGateway Ltd and Chris Munt
+- [mg-dbx](https://github.com/chrisemunt/mg-dbx)/[mg-dbx-napi](https://github.com/chrisemunt/mg-dbx-napi) by MGateway Ltd and Chris Munt
 

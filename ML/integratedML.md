@@ -1,8 +1,8 @@
 # Integrated Machine Learning Quickstart
 
-InterSystems IRIS has support for a highly automated machine learning process which is accessible with a few simple SQL commands. While the results from these automated models may not be as accurate as models carefully created by data scientists, they are generally robust and require no expertise to implement. 
+InterSystems IRIS has support for a highly automated machine learning process which is accessible with a few simple SQL commands. While the results from these automated models may not be as accurate as models carefully created by data scientists, they are generally robust and require no expertise to implement.
 
-This quickstart will go through how you can start using IRIS's Integrated Machine Learning tools from scratch to create actionable insights. 
+This quickstart will go through how you can start using IRIS's Integrated Machine Learning tools from scratch to create actionable insights.
 
 ## Download IRIS 
 
@@ -11,9 +11,9 @@ If you haven't already, you can download InterSystems IRIS Community Edition (or
 docker run --name iris-community --publish 52773:52773 --publish 1972:1972 -d intersystems/iris-community:latest-em
 ```
 
-## Install the AutoML requirement with pip 
+## Install the AutoML requirement with pip
 
-Open a bash shell in your docker container: 
+Open a bash shell in your docker container:
 
 ```bash
 docker exec -it iris-community bash
@@ -53,7 +53,7 @@ This will install `zpm`, the command to use the InterSystems package manager. To
 ```
 zpm
 ```
-Then connect to the developer community package repository: 
+Then connect to the developer community package repository:
 
 ```
 repo -r -n registry -url https://pm.community.intersystems.com/ -user "" -pass ""
@@ -112,11 +112,14 @@ Model training is done with `TRAIN MODEL <modelname>`:
 ```sql
 TRAIN MODEL TitanicSurvival
 ```
+
 or 
+
 ```
 TRAIN MODEL TitanicSurvivalWithSexAgeFare
 ```
-Model training will take a while for large datasets, but should only take a few seconds for this size of dataset. 
+
+Model training will take a while for large datasets, but should only take a few seconds for this size of dataset.
 
 ## Validate model
 After training, we can see how the model performed by validating it against the test set. This command runs validation, and outputs the metrics to the table `INFORMATION_SCHEMA.ML_VALIDATION_METRICS` 
@@ -125,12 +128,13 @@ After training, we can see how the model performed by validating it against the 
 VALIDATE MODEL TitanicSurvival FROM dc_data.TitanicTest
 ```
 
-After performing the validation, we can view the metrics by running: 
+After performing the validation, we can view the metrics by running:
 
 ```sql 
 SELECT * FROM INFORMATION_SCHEMA.ML_VALIDATION_METRICS
 ```
-Theres a number of metrics that can measure performance in different ways, for example comparing the number of false positives vs false negatives. 
+
+Theres a number of metrics that can measure performance in different ways, for example comparing the number of false positives vs false negatives.
 
 ![Validation Results](ValidationResults.png)
 
@@ -139,45 +143,59 @@ If you are interested in what all these metrics are, they are explained in the [
 This model has an accuracy of 81%, which is pretty good, especially for how simply the model was created. There is random variability here, so model statistics may differ between runs (unless a seed value is set).
 
 ## Using the model
+
 The model can be used to predict values in a table with the same schema. It can also output a probability, which can give a confidence level for the prediction. These can be done with the `PREDICT(<modelname>)` and `PROBABILITY(<modelname>)` functions. 
 
 ## Predict
+
 To predict the output of the target column, run:
+
 ```sql
 SELECT *,Survived, PREDICT(TitanicSurvival) As SurvivalPrediction FROM dc_data.TitanicTest
 ```
+
 This will create a new column called SurvivalPrediction, containing the prediction. Survived has been added to the table twice to make comparison easier.
 
 ![Table showing prediction in SurvivalPrediction Column](PredictionResults.png)
 
 It's also possible to use the results of the prediction to filter the output.
+
 ```sql
 SELECT * FROM dc_data.TitanicTest WHERE PREDICT(TitanicSurvival)=1
 ```
 
-## Probability 
+## Probability
 
 The model can also output a probability value for the prediction using the `PROBABILITY(<modelname>)` function
-```
+
+```sql
 SELECT *,Survived, PREDICT(TitanicSurvival) AS Prediction, PROBABILITY(TitanicSurvival) As Probability FROM dc_data.TitanicTest
 ```
 
 ![Results table showing Prediction and Probability of the prediction](ProbabilityResults.png)
 
-This output shows that some the incorrect results had low confidence in the original prediction - for example Passenger 708, Edward Calderhead, was predicted to have a 43% likelihood of survival, and did survive. 
+This output shows that some the incorrect results had low confidence in the original prediction - for example Passenger 708, Edward Calderhead, was predicted to have a 43% likelihood of survival, and did survive.
+
 # Regression
 
 The above example was a binary classification, classifying each datapoint into one of two categories - survived or didn't survive. It is also possible to perform regression, which is predicting a continuous value. Performing a regression is just as easy, you just need to chose a continuous numeric column as the column being predicted. 
 
-Below is an example predicting the price each passenger paid for their ticket in just 3 commands. 
+Below is an example predicting the price each passenger paid for their ticket in just 3 commands.
 
-```
+Create model:
+```sql
 CREATE MODEL FarePrediction PREDICTING (Fare) FROM dc_data.TitanicTrain 
 ```
-```
+
+Train model:
+
+```sql
 TRAIN MODEL FarePrediction
 ```
-```
+
+Predict:
+
+```sql
 SELECT TOP 10 PassengerId, Fare, PREDICT(FarePrediction) AS PredictedFare FROM dc_data.TitanicTest
 ```
 
@@ -195,14 +213,14 @@ SELECT TOP 10 PassengerId, Fare, PREDICT(FarePrediction) AS PredictedFare FROM d
 | 710         | 15.2458  | 17.18          |
 
 
-It is still worth running the model validation in the same way as shown for the classification example. Here, the validation gave a Root Mean Squared Error of 43.90, and a R^2 value of 0.35. This that 70% of the variance in the data is accounted for by the model, which is pretty good. 
+Model validation should still be run in the same way as for classification. Here, the validation gave a Root Mean Squared Error of 43.90, and a R^2 value of 0.35. This that 70% of the variance in the data is accounted for by the model, which is pretty good.
 
 The RMSE is high, this is the average difference betwen the predicted values and the actual values. This is a much bigger difference than can be seen in the output above, which may mean we have some major outliers. We can look at outliers by ordering the data by the magnitude of difference between the fare and predicted fare:
 
 ```sql
 SELECT TOP 10 PassengerId, Fare, PREDICT(FarePrediction) AS PredictedFare 
 FROM dc_data.TitanicTest 
-ORDER BY ABS(Fare - PREDICT(FarePrediction)) Desc
+ORDER BY ABS(Fare - PREDICT(FarePrediction)) DESC
 ```
 
 | PassengerId | Fare     | PredictedFare |
@@ -218,8 +236,7 @@ ORDER BY ABS(Fare - PREDICT(FarePrediction)) Desc
 | 743         | 262.3750  | 190.93     |
 | 854         | 39.4000   | 103.76     |
 
-
-So As predicted, there are some very big outliers which skew the RMSE validation statistic. But despite this, we can still see the value if we run the command again but this time in ascending order (remove `Desc` at the end):
+As predicted, there are some very big outliers which skew the RMSE validation statistic. But despite this, we can still see the value if we run the command again but this time in ascending order (remove `Desc` at the end):
 
 | PassengerId | Fare     | PredictedFare |
 |-------------|----------|--------------|
@@ -234,9 +251,8 @@ So As predicted, there are some very big outliers which skew the RMSE validation
 | 765         | 7.7750   | 7.58       |
 | 786         | 7.2500   | 7.03       |
 
-
-
 ### Other Features
+
 There are several features of Integrated ML that are beyond the scope of this guide, but can be found within the [documentation](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=GIML_Basics): 
 
 - Time series model prediction
@@ -245,4 +261,3 @@ There are several features of Integrated ML that are beyond the scope of this gu
 - Predicting probability for each class in a multi-class classification
 
 You can also read more about how the [AutoML engine works](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=GAUTOML_Intro).
-
