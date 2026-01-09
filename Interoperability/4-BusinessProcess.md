@@ -35,14 +35,14 @@ The required Business Process flow is very simple:
 
 As mentioned above, when creating a class using BPL, the class must extend `Ens.BusinessProcessBPL`:
 
-```
+```objectscript
 Class sample.interop.ProcessTransactionRouterRules Extends Ens.BusinessProcessBPL
 {...}
 ```
 
 The Business Process logic is stored inside this class as XML data (XData). The XData name needs to be BPL and it should have the XML namespace defined. 
 
-```
+```objectscript
 XData BPL [ XMLNamespace = "http://www.intersystems.com/bpl" ]
 { <...>}
 ```

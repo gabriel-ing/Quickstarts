@@ -23,13 +23,13 @@ Messages are also recommended to extend `%XML.Adatper` as this allows the body o
 
 A response message is one that is sent back to a component that has send a request message, this can simply be a 'receipt' to confirm the message has been received, or can be information being returned to the sender. For example, a business process would send a **request** to a business operation to query a database, while the operation would send a **response** back to the business process with the results of the query.  
 
-## Request Message
+## Defining the Request message
 
 We are going to simply create a message that has the columns within the original transaction CSV, as well as an additional value for Order ID, so the messages can be grouped by order ID in future, and a DateTime value to keep track of the date at which the order was processed. 
 
 Note, we are making a design choice to send a single message for each row of the CSV file. This design makes sense as we can update the stock for each item in the transaction individually. In other systems however, it may make sense to include all the data in the original file as a single message. 
 
-```
+```objectscript
 Class sample.interop.TransactionMessage Extends (%Persistent, Ens.Request, %XML.Adaptor)
 {
 
@@ -46,7 +46,7 @@ Class sample.interop.TransactionMessage Extends (%Persistent, Ens.Request, %XML.
 }
 ```
 
-## Response Message
+## Defining the Response Message
 
 We will also define a response message to return information on the current stock level from the Business Operation. This message only needs to contain the CurrentStock level, as it will be sent from a context where the ProductId and ProductName is already known, however to make it easier to track our messages, it is worth including the ProductId in the response as well.
 

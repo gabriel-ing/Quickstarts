@@ -36,7 +36,7 @@ You can also use the irispy object with server-side classes and methods. You cal
 
 So we could use the following IRIS class:
 
-```
+```objectscript
 Class sample.DemoClass 
 {
 ClassMethod AddNumbers(a As %Integer, b As %Integer) As %Integer
@@ -70,7 +70,7 @@ print(irispy.get("DemoGlobal", 1)) # Prints "Hello World"
 
 You can also create a class object, for example, say you had the IRIS class: 
 
-```
+```objectscript
 Class sample.Person Extends %Persistent
 {
 

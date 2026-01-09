@@ -127,7 +127,7 @@ Before starting to create our production, we will make the data table which our 
 
 To create the stock database, we can use a perisistent class. To keep it simple, we only need the ProductId,  ProductName, Quantity in stock, and date last sold. To make it easier to populate the table, we will also add a class method which creates a new object and saves it to the table. 
 
-```
+```objectscript
 Class sample.StockTable Extends %Persistent
 {
 
@@ -163,7 +163,7 @@ ClassMethod CreateNew(pid As %Integer, pName As %String, quantity As %Integer) A
 
 Now we have saved the above class, we can populate the table by running the following in the IRIS command line (ensure it is in the USER namespace): 
 
-```
+```objectscript
 do ##class(sample.StockTable).CreateNew(101, "Computer Mouse", 17)
 do ##class(sample.StockTable).CreateNew(102, "Monitor", 13)
 do ##class(sample.StockTable).CreateNew(103, "Laptop", 7)
@@ -173,11 +173,12 @@ do ##class(sample.StockTable).CreateNew(105, "Keyboard", 11)
 
 Now, we can open the SQL Editor at [http://localhost:52773/csp/sys/exp/%25CSP.UI.Portal.SQL.Home.zen?$NAMESPACE=USER](http://localhost:52773/csp/sys/exp/%25CSP.UI.Portal.SQL.Home.zen?$NAMESPACE=USER) and view the table with:
 
-```
+```sql
 SELECT 
 ID, DateLastSold, ProductId, ProductName, Quantity
 FROM sample.StockTable
 ```
+
 Which outputs the following table 
 
 |  ID  | DateLastSold | ProductId | ProductName    | Quantity |

@@ -22,12 +22,13 @@ These errors show that we have defined the directories for the file input and wh
 
 This can be fixed by creating these directories. Depending on how you are using InterSystems IRIS, how to create the directories may vary, but if you are using it within a docker container (called myiris), one way is to use a bash shell:
 
-```
+```sh
 docker exec -it myiris bash
 ```
-Then create the directories: 
 
-```bash
+Then create the directories:
+
+```sh
 mkdir /home/irisowner/fileInput
 mkdir /home/irisowner/ProcessedFiles
 ```
@@ -38,14 +39,15 @@ If you press the reload button or refresh the page, the `FromCSV` dot should tur
 
 To test the production, we can add a new transaction.csv file into our fileInput folder. We can create a transaction file with the following: 
 
-```
+```csv
 ProductId,ProductName,Quantity
 103,Laptop, 2
 104,Desktop PC, 9
 ```
+
 Save this as transaction.csv, then move or copy this file into the fileInput folder. Again, if you are running iris in a docker container, one method of doing so would be using `docker`: 
 
-```
+```sh
 docker cp transaction.csv myiris:/home/irisowner/fileInput
 ```
 
@@ -83,7 +85,7 @@ The first error is the automatic error, and arises because the SMTP server prope
 The second error "Email Send Fail" is the error being logged within the ObjectScript Code. The source code for this operation includes the following: 
 
 
-```
+```objectscript
     // Use the outbound adapter to send the email
     set tSc = ..Adapter.SendMail(email)
 

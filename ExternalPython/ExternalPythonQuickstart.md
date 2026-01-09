@@ -8,7 +8,7 @@ This guide refers to connecting to instances of InterSystems IRIS using applicat
 
 The SDK can be installed using pip: 
 
-```
+```sh
 pip install intersystems-irispython
 ```
 
@@ -27,9 +27,6 @@ connection = iris.connect(server, port, namespace, username, password)
 ```
 
 From the connection object, you can either create a `irispy` object to access globals and server-side methods, or create a `cursor` object to run SQL queries on a database with the DB-API. 
-
-
-
 
 ### Further Reading
 - [Orientation for Python Developers | Orientation for Python Developers | InterSystems IRIS Data Platform](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=GPYDEV_journey)

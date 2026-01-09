@@ -54,13 +54,13 @@ Method UpdateDatabase(pReq As sample.interop.TransactionMessage, Output pResp As
 
 #### Adapters
 
-Adapters can be added to a Business Operation using the parameter `ADAPTER`. Adapters will add settings to the Business Operation settings which are visible within the Production Configuration Portal. Adapters can be used within a Method using the `..` notation to access the components of a parent class: 
+Adapters can be added to a Business Operation using the parameter `ADAPTER`. Adapters will add settings to the Business Operation settings which are visible within the Production Configuration Portal. Adapters can be used within a Method using the `..` notation to access the components of a parent class:
 
 ```
 Parameter ADAPTER = "EnsLib.EMail.OutboundAdapter";
 ```
 
-Then in the method: 
+Then in the method:
 
 ```
 Method SendEmail(pReq As sample.interop.TransactionMessage, Output pResp As Ens.Response) As %Status
@@ -72,22 +72,21 @@ Method SendEmail(pReq As sample.interop.TransactionMessage, Output pResp As Ens.
 
     set status = ..Adapter.SendEmail(email)
 ```
-The Adapter Settings, like where the email is being sent to, are defined within the Business Operation Settings panel. This will be shown in more detail below. 
 
+The Adapter Settings, like where the email is being sent to, are defined within the Business Operation Settings panel. This will be shown in more detail below.
 
 ## Implementing The Operations
 
 Below we will define two operations :
 
-- `ToUpdateStock` will receive a `sample.interop.TransactionMessage`, update the stock table based on the contents of this message, then it will send a response message with the current quantity in stock using the `sample.interop.StockMessage`. 
-- `ToEmail` will receive a `sample.interop.TransactionMessage` detailing a product low in stock and will send a warning email to the warehouse. 
+- `ToUpdateStock` will receive a `sample.interop.TransactionMessage`, update the stock table based on the contents of this message, then it will send a response message with the current quantity in stock using the `sample.interop.StockMessage`.
+- `ToEmail` will receive a `sample.interop.TransactionMessage` detailing a product low in stock and will send a warning email to the warehouse.
 
-### Updating Stock 
-
+### Updating Stock
 
 This can be implemented by accessing the product in the database using an object Model (using the `.%OpenId()`) function, updating the values and saving it back to the database. The response message is defined as the output in the original parameters of the method, and is returned automatically upon quitting the method.
 
-```
+```objectscript
   Method UpdateDatabase(pReq As sample.interop.TransactionMessage, Output pResp As sample.interop.StockMessage) As %Status
     {
         // Open the stock item in the database
@@ -124,7 +123,7 @@ The settings for this adapter need to be configured to use an SMTP server to sen
 
 This adapter is able to send instances of the `%Net.MailMessage` class, which have `text` and `subject` lines sent. 
 
-```
+```objectscript
     set email = ##class(%Net.MailMessage).%New()
     do email.TextData.Write("This is the message body")
     set email.Subject = "This is the email subject"
@@ -133,7 +132,7 @@ This adapter is able to send instances of the `%Net.MailMessage` class, which ha
 
 To implement this in our method, we need to include information from the call request message, this can be put in as a parameter. We also need to include a response message, although this does not need to be populated. 
 
-```
+```objectscript
 Method SendEmail(pReq As sample.interop.TransactionMessage, Output pResp As Ens.Response) As %Status
 {
     // Create a new email object
@@ -268,16 +267,12 @@ See below for the complete code of the classes created.
 
 Continue by creating a [Business Process](BusinessProcess.md) to call these operations. 
 
-
-
-
-
 ## Full Code
 
 ### Updating Stock
 
 
-```
+```objectscript
 Class sample.interop.ToUpdateStock Extends Ens.BusinessOperation
 {
 
@@ -322,7 +317,7 @@ Method UpdateDatabase(pReq As sample.interop.TransactionMessage, Output pResp As
 
 ### Mail Operation
 
-```
+```objectscript
 Class sample.interop.ToEmail Extends Ens.BusinessOperation
 {
 

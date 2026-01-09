@@ -16,7 +16,7 @@ There are a wide number of inbound adapters availble, but its also possible to c
 
 Inbound adapters commonly require additional settings, like for a File adapter it needs a directory and a file name pattern to watch for files. When a business service uses an adapter, these adapter settings are made available within the Production Configuration portal. The inbound adapter in use needs to be set using the ADAPTER parameter: 
 
-```
+```objectscript
 Parameter ADAPTER = "EnsLib.file.InboundAdapter";
 ```
 
@@ -24,12 +24,12 @@ Parameter ADAPTER = "EnsLib.file.InboundAdapter";
 
 We can  add configurable settings to the Business Service (or any other component) by creating properties for the settings, then adding them to the SETTINGS parameter. In this example we are going to make the message target configurable, this is the business process that the message will be sent to. To do this, we add 
 
-```
+```objectscript
 Property MessageTarget As %String;
 ```
 To create the property which the setting is stored in. Then the property can be added to the configuration settings with: 
 
-```
+```objectscript
 Parameter SETTINGS = "MessageTarget:Basic";
 ```
 The term ":Basic" means that this will be added to the Basic Settings portion of the Production Configuration Settings.  
@@ -38,7 +38,7 @@ The term ":Basic" means that this will be added to the Basic Settings portion of
 
 The actions behind the business service are defined using the `OnProcessInput` method, this is the function which is activated by the Inbound Adapter. In our case, the adapter is activated by detecting a file in the directory it is watching (defined by the FilePath Setting). The adapter reads this file and passes it to the business service as a `%Stream.FileCharacter` Object, which is the text-file object. We therefore define the `OnProcessInput` with the following:
 
-```
+```objectscript
 Method OnProcessInput(pInput As %Stream.FileCharacter) As %Status
 {...}
 ```
@@ -56,18 +56,20 @@ The method needs to:
 
 These can be implemented in the following way: 
 
-#### Create an order number: 
+#### Create an order number:
 
-```
+```objectscript
     // Increment the Order ID
     set OrderId = $Increment(^OrderCounter)
 ```
-#### Read each line of CSV file: 
+
+#### Read each line of CSV file:
+
 The file is read into the `pInput` parameter of the `OnProcessInput` method. The lines of the file can be read wth the `.ReadLine()` file. 
 
 As a CSV file has a line which contains headers, we need to read a line 
 
-```
+```objectscript
 // Read the headers line of the csv file
 set headers = pInput.ReadLine()
 
@@ -85,7 +87,7 @@ It also requires some rudimentary data handling using the `$ZString(<string>, "*
 
 There are more sophisticated ways to handle CSV files, for example using the [CSV Record Wizard](https://docs.intersystems.com/iris20252/csp/docbook/DocBook.UI.Page.cls?KEY=EGDV_recmap#EGDV_recmap_create_wizard), but for this introductory guide, we will stick to the rudimentary CSV parsing. 
 
-```
+```objectscript
         // Create a new message for each transaction line
         set msg = ##class(sample.interop.TransactionMessage).%New()
         
@@ -108,7 +110,7 @@ To convert this into a usable date string, we can use `$ZDATETIME()`, this takes
 
 There are equavalents for $ZDATE, $ZTIME and various other useful date-time functions in [the documentation](https://docs.intersystems.com/irislatest/csp/docbook/Doc.View.cls?KEY=RCOS_vhorolog), but for now we can use `$ZDATETIME($HOROLOG,3)` to get the datetime. 
 
-```
+```objectscript
         // Add the processing date and time as an ODBC format datetime string
         set msg.DateTime = $ZDATETIME($HOROLOG, 3)
 ```
@@ -120,13 +122,14 @@ Asynchronous requests mean that the program will not wait for a response before 
 
 The `..` syntax means the `SendRequestAsync` and the `MessageTarget` property are both coming from the parent class, rather than having been defined within the `OnProcessInput` method. 
 
-```
+```objectscript
        // Send Asynchronous request
         set st=..SendRequestAsync(..MessageTarget, msg)
 ```
 
-We can check that the message has successfully been sent: 
-```
+We can check that the message has successfully been sent:
+
+```objectscript
         if ('st){
         $$$LOGERROR("Cannot call Process for ProductID "_$Piece(line, ",", 1))
         }
@@ -186,7 +189,8 @@ The full code for the class is availble below.
 The final guide of the series, [UsingTheProduction](UsingTheProduction.md) demonstrates how this production can be used, including testing the business service. 
 
 ### Full Class
-```
+
+```objectscript
 Class sample.interop.FromCSV Extends Ens.BusinessService
 {
 
