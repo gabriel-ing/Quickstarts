@@ -12,7 +12,7 @@ To get started using analytics, start an instance of InterSystems IRIS. This can
 docker run --name iris-analytics --publish 1972:1972 --publish 52773:52773 -d intersystemsdc/iris-community:latest-em
 ```
 
-Its recommended to use the docker image at `intersystemsdc` because this has the InterSystems Package Manager pre-installed, but [IPM can also be installed separately](https://github.com/intersystems/ipm). IPM will be used to install the samples data below.
+Its recommended to use the Docker image at `intersystemsdc` because this has the InterSystems Package Manager pre-installed, but [IPM can also be installed separately](https://github.com/intersystems/ipm). IPM will be used to install the samples data below.
 
 Log into the management portal at http://localhost:52773/csp/sys/%25CSP.Portal.Home.zen with the credentials:
 
