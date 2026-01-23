@@ -32,9 +32,9 @@ irispy.kill("myGlobal")
 connection.close()
 ```
 
-You can also use the irispy object with server-side classes and methods. You call class method using `irispy.classMethodValue` or `irispy.classMethodVoid`, where value and void specify whether anything is returned from the class method. If you need specific return types, you also used `irispy.classMethodString`, or replace `String` with another datatype. 
+You can also use the irispy object with server-side classes and methods. You call class method using `irispy.classMethodValue` or `irispy.classMethodVoid`, where value and void specify whether anything is returned from the class method. If you need specific return types, you also used `irispy.classMethodString`, or replace `String` with another datatype.
 
-So we could use the following IRIS class:
+So if we had the following class loaded in IRIS (see [Set-up Development Environment in VS Code](link) for details on how to edit, load and compile IRIS Classes.)
 
 ```objectscript
 Class sample.DemoClass 
@@ -50,7 +50,7 @@ ClassMethod IncrementGlobal(value As %String) As %Status
 }
 ```
 
-With:
+We could use this with: 
 
 ```python
 # See above for connection
@@ -68,7 +68,7 @@ print(irispy.get("DemoGlobal", 1)) # Prints "Hello World"
 
 ```
 
-You can also create a class object, for example, say you had the IRIS class: 
+You can also create a class object, for example, say you had the IRIS class:
 
 ```objectscript
 Class sample.Person Extends %Persistent
@@ -89,7 +89,7 @@ Class sample.Person Extends %Persistent
 }
 ```
 
-You could use this in an external Python application with: 
+You could use this in an external Python application with:
 
 ```python
 # Create new class object 
