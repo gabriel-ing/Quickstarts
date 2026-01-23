@@ -103,7 +103,7 @@ CREATE MODEL TitanicSurvival PREDICTING (Survived) FROM dc_data.TitanicTrain
 It is possible to define which columns to use for the prediction using the WITH keyword, this is not required as the AutoML model will automatically find and use the relevant columns. If you do define the columns used, you do also need to 
 
 ```sql
-CREATE MODEL TitanicSurvivalWithSexAgeFare PREDICTING (Survived) WITH (Sex varchar, Age integer, Fare numeric) FROM dc_data.TitanicTrain
+CREATE MODEL TitanicSurvivalWithSexAgeFare PREDICTING (Survived) WITH (Sex VARCHAR, Age INTEGER, Fare NUMERIC) FROM dc_data.TitanicTrain
 ```
 
 ### Train the model
@@ -113,7 +113,7 @@ Model training is done with `TRAIN MODEL <modelname>`:
 TRAIN MODEL TitanicSurvival
 ```
 
-or 
+or
 
 ```
 TRAIN MODEL TitanicSurvivalWithSexAgeFare
@@ -122,7 +122,7 @@ TRAIN MODEL TitanicSurvivalWithSexAgeFare
 Model training will take a while for large datasets, but should only take a few seconds for this size of dataset.
 
 ## Validate model
-After training, we can see how the model performed by validating it against the test set. This command runs validation, and outputs the metrics to the table `INFORMATION_SCHEMA.ML_VALIDATION_METRICS` 
+After training, we can see how the model performed by validating it against the test set. This command runs validation, and outputs the metrics to the table `INFORMATION_SCHEMA.ML_VALIDATION_METRICS`
 
 ```sql
 VALIDATE MODEL TitanicSurvival FROM dc_data.TitanicTest
@@ -183,6 +183,7 @@ The above example was a binary classification, classifying each datapoint into o
 Below is an example predicting the price each passenger paid for their ticket in just 3 commands.
 
 Create model:
+
 ```sql
 CREATE MODEL FarePrediction PREDICTING (Fare) FROM dc_data.TitanicTrain 
 ```
@@ -236,7 +237,7 @@ ORDER BY ABS(Fare - PREDICT(FarePrediction)) DESC
 | 743         | 262.3750  | 190.93     |
 | 854         | 39.4000   | 103.76     |
 
-As predicted, there are some very big outliers which skew the RMSE validation statistic. But despite this, we can still see the value if we run the command again but this time in ascending order (remove `Desc` at the end):
+As predicted, there are some very big outliers which skew the RMSE validation statistic. But despite this, we can still see the value of the results if we run the command again but this time in ascending order (remove `Desc` at the end):
 
 | PassengerId | Fare     | PredictedFare |
 |-------------|----------|--------------|
@@ -253,7 +254,7 @@ As predicted, there are some very big outliers which skew the RMSE validation st
 
 ### Other Features
 
-There are several features of Integrated ML that are beyond the scope of this guide, but can be found within the [documentation](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=GIML_Basics): 
+There are several features of Integrated ML that are beyond the scope of this guide, but can be found within the [documentation](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=GIML_Basics):
 
 - Time series model prediction
 - Integration with ML-as-a-Service providers H2O and DataRobot.
