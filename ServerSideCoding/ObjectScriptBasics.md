@@ -3,7 +3,7 @@
 - ObjectScript is a weakly typed language, meaning the type of variable is not defined in the code. 
 - Standard operators are case insensitive while variable names are are case sensitive.
 - `//` denotes a comment, ``/*  */`` denotes multi-line comments. 
-- ObjectScript is compiled into code 
+- ObjectScript is compiled into shorthand code.
 
 Below is a quick guide to the most basic features of the language.
 
