@@ -8,6 +8,7 @@
 Below is a quick guide to the most basic features of the language.
 
 ## Setting Variables
+
 Variables are defined and set with the `set` command:
 
 ```objectscript
@@ -48,6 +49,8 @@ To run functions, the `do` command is used. For a function stored within a class
 do ##class(packagename.ClassName).MethodName()
 ```
 
+Note, this command will fail as the Class and Method have not been defined. For more information on classes, methods and class methods, see the [Intro to InterSystems IRIS Classes]().
+
 ## Lists and Arrays 
 
 To create and access list items, you can use the `$LISTBUILD` and `$LIST` functions:
@@ -60,6 +63,7 @@ write $LIST(mylist, 2) //prints "Orange" (index starts at 1)
 ```
 
 Arrays on the other hand, are stores of key-value pairs. The keys can be integers or strings:
+
 ```objectscript
 // Arrays 
 set myarray(1) = "Hello"
@@ -96,10 +100,10 @@ if (n = 1){
 } elseif (n = 2){
 	write "Two"
 } else {
-	write "Not One or Two
+	write "Not One or Two"
 }
-
 ```
+
 Conditionals can also be added to other commands, using inline conditionals. These take the form of `{command}:{conditional} {Parameter if condition is true}`
 
 ```objectscript
@@ -124,7 +128,7 @@ for i=1: 1: 10 {
 	// ! is the new line operator
 	write i , ! 
 	
-}// Outputs the numbers between 1 and 10 (inclusive) on new lines
+} // Outputs the numbers between 1-10 (inclusive) on new lines
 ```
 
 ### While Loop
@@ -134,11 +138,11 @@ And the basic while loop is as follows:
 ```objectscript
 set x=1
 while x<10 {
-	write x, 1
+	write x, !
 	set x = x+1
 } 
 
-// Digits from 1-10 on new lines
+// Outputs numbers 1-9 on new lines
 ```
 
 If you want the loop to execute once before evalutating the expression, you can use `do...while`L 
@@ -146,7 +150,7 @@ If you want the loop to execute once before evalutating the expression, you can 
 ```objectscript
 set x=1
 do {
-	write x,1
+	write x, !
 	set x=x+1
 } while x<2
 
@@ -163,8 +167,13 @@ try{
 	write newarray(2)
 }
 catch{
-	write "Code Errored - maybe we haven't defined newarray(2)"
+	write "Code Errored - maybe we haven't defined newarray(2)", !
+	write "The Error Message is "_$ZERROR,!
 }
+
+// Running this (as a method/class method) would output:
+// Code Errored - maybe we haven't defined newarray(2)
+// The Error Message is <UNDEFINED>MethodName+3^packagename.ClassName.1 *newarray(2)
 ```
 
 ## Case insensitivity and shorthand
@@ -185,10 +194,9 @@ Some other examples of this are shown below:
 ```objectscript
 w n // Shorthand for Write
 
-set mylist =$LB("1", "2") // Shorthand for $listbuild
+set mylist = $LB("1", "2") // Shorthand for $listbuild
 
 zw newarray // Shorthand for Zwrite
 
 d ##class(packagename.ClassName).MethodName() // Shorthand for Do
 ```
-
