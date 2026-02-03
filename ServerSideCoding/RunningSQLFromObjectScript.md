@@ -1,31 +1,86 @@
 # Using SQL in Server-Side Code
 
 ## ObjectScript
+### Sample Data Set-up
+
+To test the queries and methods in this guide, you may wish to create a demo table, you can do this with the following persistent class. Save and compile the class below in your InterSystems IRIS instance. For instructions on getting set-up, see [Getting InterSystems IRIS with Docker]() and [Setting Up Development Environment with VS Code](). 
+
+```objectscript
+Class sample.Person Extends %Persistent{
+
+  Property PersonId As %Integer;
+  
+  Property FirstName As %String;
+ 
+  Property LastName As %String;
+ 
+  Property Age As %Integer;
+
+ClassMethod Populate(pId as %Integer, pFirstName As %String, pLastName As %String, pAge As %Integer ) as %Status
+{
+  // Instantiate Person
+  set person = ##class(sample.Person).%New()
+
+  // Set Properties
+  set person.PersonId = pId
+  set person.FirstName = pFirstName
+  set person.LastName = pLastName
+  set person.Age = pAge
+  
+  // Save to Database
+  set status = person.%Save()
+  // Return status
+  return status
+}
+
+}
+```
+
+After compiling the class above, you can run the following in the terminal:
+
+```objectscript
+do ##class(sample.Person).Populate(1, "Peter", "Parker", 17)
+do ##class(sample.Person).Populate(2, "Diana", "Prince", 25)
+do ##class(sample.Person).Populate(3, "Clark", "Kent", 30)
+do ##class(sample.Person).Populate(4, "Natasha", "Romanoff", 28)
+do ##class(sample.Person).Populate(5, "Bruce", "Wayne", 42)
+```
+
 ### Embedded SQL
 You can run SQL queries and transactions using objectscript in several ways. The simplest is Embedded SQL, this is only suitable for simple queries:
 
-```
+```objectscript
 Class packagename.SQLBasics {
 
-ClassMethod BasicEmbeddedSQL()
-{
-  &sql(SELECT Name INTO :name FROM packagename.Person WHERE id = 1)
-  write "The first entry in the Person table is: ", name, !
-}
+  ClassMethod BasicEmbeddedSQL()
+  {
+      new PersonID, FirstName, LastName, Age
+
+      &sql(
+          SELECT PersonID, FirstName, LastName, Age
+          INTO :PersonID, :FirstName, :LastName, :Age
+          FROM sample.Person
+          WHERE PersonID = 1
+          )
+
+      write "The first entry in the Person table is: ", FirstName, LastName, !
+      // outputs The first entry in the Person table is: PeterParker
+
+  }
 }
 ```
 
 For more complicated queries with SQL, you can define and use a cursor. However, it is recommended to use Dynamic SQL, as shown below instead. To read more about Cursor-based embedded SQL, [see the documentation](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=GSQL_esql).
 
-### Dynamic SQL:
+### Dynamic SQL
 
 If you need to create a query at runtime which involves a variable, you might be best using dynamic SQL. A basic example of this is shown below: 
 
-```
+```objectscript
 ClassMethod BasicDynamicSQL(numOutput as %Integer, minAge as %Integer) As %Status{
   
   // Create SQL Query as string. Replace variables with ?
-  set myquery = "SELECT TOP ? Name,DOB FROM Sample.Person WHERE Age < ?"
+  set myquery = "SELECT TOP ? FirstName, LastName FROM sample.Person WHERE Age > ?"
  
   // Create %SQL.Statement object  
   set tStatement = ##class(%SQL.Statement).%New()
@@ -38,7 +93,7 @@ ClassMethod BasicDynamicSQL(numOutput as %Integer, minAge as %Integer) As %Statu
 	   write "%Prepare failed:" 
 	   do $System.Status.DisplayError(qStatus) 
 	   quit
-   }
+  }
   // Execute the query, passing in parameters for placeholder ?
   set rset = tStatement.%Execute(numOutput, minAge)
   
@@ -47,7 +102,7 @@ ClassMethod BasicDynamicSQL(numOutput as %Integer, minAge as %Integer) As %Statu
   write !,"End of data" 
 }
 ```
-It is important to use ? placeholders and the Statement.%Prepare() function for security, as this prevents injection of malicious code in the placeholders.
+It is important to use ? placeholders and the Statement.%Prepare() function for security, as this prevents injection of malicious code in the placeholders (SQL injection).
 
 ### Using a Query component
 
@@ -58,15 +113,16 @@ Class packagename.SQLQuery Extends %RegisteredObject
 {
   Query ByName (pStartsWith As %String) As %SQLQuery [ sqlProc ] 
   {
-      SELECT ID, NAME,
-      FROM packagename.Person
-      WHERE (Name %STARTSWITH @pStartsWith)
+      SELECT PersonID, FirstName, LastName, Age
+      FROM sample.Person
+      WHERE (Name %STARTSWITH :pStartsWith)
   }
+}
 ```
 
 And the following class method in our SQLBasics class: 
 
-```
+```objectscript
 ClassMethod UseQueryByName(name As %String)
 {
     // Create Statement object
@@ -99,9 +155,10 @@ ClassMethod UseQueryByName(name As %String)
 
 ```
 
-This method of running a SQL query in ObjectScript can be effective for creating complex queries. 
+This method of running a SQL query in ObjectScript can be effective for creating complex queries and having complete control of the execution or run-time.
 
-You can also use the query direct as a function by adding Func to the query name:
+You can also use the query direct as a function by adding Func to the query name. This can be preferred for simple, pre-defined queries.
+
 ```
 ClassMethod UseQueryByNameFunction(name As %String)
   {

@@ -2,52 +2,103 @@
 
 JavaScript and TypeScript backends running on Node.js can connect to InterSystems IRIS using several available tools. The official InterSystems IRIS native SDK is [@intersystems/intersystems-iris-native](https://www.npmjs.com/package/@intersystems/intersystems-iris-native?activeTab=readme). 
 
-This package can be installed using node package manager (npm) with: 
+
+## Set-up
+
+To use the Node.js SDK, first install Node.js. Then, start a new project with:
 
 ```
-npm i @intersystems/intersystems-iris-native
+npm init -y 
 ```
 
-After this, the driver can be used as follows: 
+The `-y` flag skips interactive questions about the project, including name (it will take the directory name), version, description, etc. 
+
+Then install the InterSystems IRIS SDK with:
+
+```
+npm install @intersystems/intersystems-iris-native
+```
+
+To use the package, you can either use ES Module syntax (`import`), or commonjs syntax (`require`). The npm default is the commonjs syntax. For this use:
+
+```js
+const irisnative = require("@intersystems/intersystems-iris-native");
+```
+
+To use ES Module syntax, change open the `package.json` file in your directory, change the type value to the following:
+
+```json
+	"type":"module", 
+```
+
+With ES Module syntax, you can import the package with: 
+
+```js
+import * as irisnative from "@intersystems/intersystems-iris-native";
+```
+
+
+## Connection
+
+To connect to an instance of InterSystems IRIS, first ensure the instance is running. You will need the standard connection credentials of server (or host), superserver port (default is 1972), namespace, username and password. The example below shows the connection to an instance of InterSystems IRIS community running locally.
 
 ```js
 // Import the irisnative package
-import * as irisnative from "@intersystems/intersystems-iris-native"
-
+import * as irisnative from "@intersystems/intersystems-iris-native";
 
 // Create the connection
 const connection = irisnative.createConnection({
-    host:'localhost', // server
+    host:'localhost', // Server
     port:1972, // Port
     ns:'USER', // Namespace
     user:'SuperUser', // Username
     pwd:'SYS' // Password
   })
 
-// Create irisjs object
-const irisjs = connection.createIris()
-
-console.log("connection made")
-
-// Set a global ( ^test(1) = "hello world!" )
-irisjs.set('hello world!','test',1)
-
-// Get a global 
-console.log(iris.get('test',1))
+if (connection){
+    console.log("Connection Made!")
+}
 
 // Close the connection
 connection.close()
 ```
 
+To use this example, save the code into a file, `demo.js`. Then run the file with:
 
-## Native connection (globals and methods)
+```sh
+node ./demo.js
+```
+
+## Accessing Globals
+
+To access globals, create an `irisjs` object using `connection.createIris()`. Then use standard `.set` and `.get` methods.
+
+```js
+// Create irisjs object
+const irisjs = connection.createIris()
 
 
-You can use this `irisjs` object to used with server-side classes and methods. You call class method using `irisjs.classMethodValue` or `irisjs.classMethodVoid`, where value and void specify whether anything is returned from the class method.
+// Set a Global 
+// Syntax : irisjs.set("Value", "GlobalName", "subscript1", "subscript2" )
 
-If you need specific return types, you also used `irispy.classMethodString`, or replace `String` with another datatype. 
+irisjs.set('Hello World!','Test',1) // Equivalent to: Set ^Test(1) = "Hello World!"
 
-So we could use the following IRIS class:
+
+// Get a global 
+// Syntax: irisjs.get("GlobalName", "subscript1", "subscript2" )
+
+const globalValue = irisjs.get('Test',1) // Accessing ^Test(1) 
+
+console.log(globalValue) // Outputs "Hello World!"
+```
+
+To test this snippet, copy it into the `demo.js` file above, **before** the connection.close() call. Then run the file again with `node ./demo.js`.
+
+## Calling IRIS Methods
+
+The `irisjs` object can also use IRIS methods and classes. To call class method use `irisjs.classMethodValue` or `irisjs.classMethodVoid`, where value and void specify whether anything is returned from the class method. If you need specific return types, you also used `irispy.classMethodString`, or replace `String` with another datatype.
+
+For example, if we had the following class in our instance of InterSystems IRIS (for information on how to load this into your instance, see [Set-up your development environment in VSCode](link).
 
 ```objectscript
 Class sample.DemoClass 
@@ -63,7 +114,7 @@ ClassMethod IncrementGlobal(value As %String) As %Status
 }
 ```
 
-With:
+We could use the following code to access the Class Methods:
 
 ```js
 // See above for connection
@@ -80,7 +131,6 @@ console.log(irisjs.get("DemoGlobal")) // Prints 1 (or the number of times Increm
 
 console.log(irisjs.get("DemoGlobal", 1)) // Prints "Hello World"
 
-
 ```
 
 You can also create a class object, for example, say you had the IRIS class:
@@ -89,18 +139,17 @@ You can also create a class object, for example, say you had the IRIS class:
 Class sample.Person Extends %Persistent
 {
 
-	Property Name As %String;
-	
-	Property Age As %Integer;
-	
-	Method setName(name As %String) As %Status{
-		set ..Name = name
-		return
-	}
-	
-	Method addYears(num as %Integer) As %Integer {
-		return ..Age + num
-	}
+    Property Name As %String;
+    
+    Property Age As %Integer;
+    
+    Method setName(name As %String) As %Status{
+        set ..Name = name
+    }
+    
+    Method addYears(num as %Integer) As %Integer {
+        return ..Age + num
+    }
 }
 ```
 
@@ -116,7 +165,7 @@ person.set("Age", 25)
 // Get property with .get(property)
 console.log(`Person's age is ${person.get("Age")}`) // Prints "Person's age is 25"
 
-// Call method without returning a vaule with .invokeVoid(methodName, arg1, arg2, ...)
+// Call method without returning a value with .invokeVoid(methodName, arg1, arg2, ...)
 person.invokeVoid("setName", "Alison Turner")
 
 console.log(`Person's name is ${person.get("Name")}`) // Prints "Person's name is Alison Turner"
@@ -128,7 +177,6 @@ console.log(`New age is ${new_age}`) // Prints "New age is 30
 // Save the object by invoking the %Save method
 person.invokeVoid("%Save")
 ```
-
 
 ## Community libraries
 

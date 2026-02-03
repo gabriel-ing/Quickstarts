@@ -4,7 +4,8 @@ This page provides a quick reference guide to setting up and using the recommend
 
 VS Code is the recommended development platform for IRIS and ObjectScript code.  VS Code is widely used, available on Windows, Mac and Linux, and can be downloaded from the [VS Code website](https://code.visualstudio.com/download). 
 
-There are three officially supported VS Code extensions to improve the development experience: 
+There are three officially supported VS Code extensions to improve the development experience:
+
 - InterSystems Language Server
 - InterSystems Server Manager
 - InterSystems ObjectScript Extension
@@ -123,8 +124,6 @@ To manually Import and Compile the file, right click on the file in the Workspac
 - **SQLTools for IRIS** - Lightweight SQL connection for quick queries. Community supported but not officially supported. 
 -  **Jupyter** and **Jupyter Server Proxy for InterSystems IRIS** for Jupyter Notebook support in VS code.
 - **REST Client** - allows sending of HTTP Requests from VS Code.
-
-
 
 ### Further Resources
 
