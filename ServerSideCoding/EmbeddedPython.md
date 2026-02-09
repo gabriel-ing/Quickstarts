@@ -1,8 +1,19 @@
-### Embedded Python 
+# Embedded Python 
 
 As of 2022, Python can be used in InterSystems IRIS classes with no significant performance cost. To use Embedded Python, simply add the keyword tag `[language=python]` after an InterSystems IRIS method or class method. 
 
 This is generally the most efficient method to use Python with InterSystems IRIS, but you can also connect external applications to InterSystems IRIS, see the [Client-side Python page](../ExternalPython/ExternalPythonQuickstart.md) for more detail.
+
+## Python From IRIS, IRIS from Python
+
+There are two 
+
+## Setup 
+
+
+
+
+
 
 ```python
 Class packagename.PythonClass { 
