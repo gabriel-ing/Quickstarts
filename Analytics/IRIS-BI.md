@@ -68,7 +68,7 @@ Raw data alone is not sufficient for analytics; some processing is necessary. Pr
 
 Data organisation is done with [OLAP Cubes](https://en.wikipedia.org/wiki/OLAP_cube). Cubes are multi-dimensional data structures that organize data into measures (values like the sum, average or count), and dimensions (like time, category or region). They enable users to slice, filter, drill down and aggregate large datasets.  
 
-### 2. Create Pivot Tables in the Analyzer portal
+### 2. Create Pivot Tables in the Analyzer Portal
 
 Pivot tables are a way of organising the multi-dimensional cube data into two dimensional tables containing the required data for a specific view or purpose.
 
@@ -129,7 +129,7 @@ There are many more settings and configurations to explore, these can be found i
 4. Check, compile and build
 
     At this point, your new cube should look something like this:
-![alt text](image-4.png)
+![alt text](images/newCube.png)
 
     - Hit Compile to ensure the cube definition is saved and compiled.
     - Hit Build to create the cube from the definition created.

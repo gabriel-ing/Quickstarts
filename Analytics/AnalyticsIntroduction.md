@@ -2,7 +2,7 @@
 
 As a complete data-platform, InterSystems IRIS has solutions for every step in the process of transforming data to insight. Data can be loaded from various sources, transformed with tools like [dbt-iris](https://pypi.org/project/dbt-iris/) and used to generate predictions with [integratedML](../ML/integratedML.md). Visualising and reporting on data is equally flexible, with options for every use case.
 
-There are three options for reporting on data stored in InterSystems IRIS. Following an overview of the available options, there is a guide to using IRIS BI, the built-in tool included with InterSystems IRIS installation.
+There are several options for reporting on data stored in InterSystems IRIS. Following an overview of the available options, there is a guide to using IRIS BI, the built-in tool included with InterSystems IRIS installation.
 
 For an overview of all the analytics tools and offerings available see [A Whirlwind Tour of the Analytics Buffet | Youtube](https://www.youtube.com/watch?v=A4qAbMMQMaA)
 
@@ -22,7 +22,7 @@ Built-in tool for creating cubes, pivot tables and dashboards. IRIS BI is shippe
 
 ### More Information on IRIS BI
 
-- [IRIS-BI Quickstart | Developer Hub](./IRIS-BI.md)
+- IRIS-BI Quickstart | Developer Hub (below)
 - [InterSystems IRIS Business Intelligence - Tips & Tricks](https://www.youtube.com/watch?v=Ekjzny8zj98)
 - [Introduction to Business Intelligence | Documentation](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=D2GS_ch_intro)
 - [Getting Started Tutorial | Documentation](https://docs.intersystems.com/irislatest/csp/docbook/DocBook.UI.Page.cls?KEY=D2DT_ch_setup)
@@ -45,8 +45,6 @@ InterSystems Reports has two parts, a designer IDE and a server for hosting web 
 - Creating pixel-perfect printable reports (e.g. invoices, regulatory documents)
 - Report scheduling and distribution  
 - Interactive web-based reporting for end-users
-
-For more information about InterSystems Reports see [Moving To InterSystems Reports | Youtube](https://www.youtube.com/watch?v=ioHHCzEtGoQ).
 
 ### More information on InterSystems Reports
 
@@ -103,6 +101,6 @@ PowerBI also includes an InterSystems IRIS connector, which can allow access to 
 |---------------------------|-----------------------------------------|---------------------------------------------|---------------------------------------------|-------------------------------------------|
 | **Purpose**              | Embedded analytics, cubes, dashboards | Pixel-perfect layouts, interactive web reports, scheduling & distribution            | Access layer for third-party BI tools      | Simple connection to BI tools            |
 | **Best For**             | Real-time data, in-app analytics       | Regulatory/compliance reports, scheduled distribution | Consistent results across all third-party applications     | Quick integration with PowerBI, Tableau  |
-| **Installation**         | Included with IRIS                     | Separate install (Editor + Server)         | Separata install              | ODBC driver or PowerBI Connector                   |
+| **Installation**         | Included with IRIS                     | Separate install (Editor + Server)         | Separate install              | ODBC driver or PowerBI Connector                   |
 | **License**              | Standard IRIS license                  | Advanced Server license                    | Licensed per core                          | Standard IRIS license                    |
 | **Integration**          | Native to IRIS                         | Web reports          | Tableau, PowerBI, Excel                    | PowerBI connector, JDBC/ODBC             |
